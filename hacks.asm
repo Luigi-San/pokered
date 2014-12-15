@@ -9,4 +9,4 @@
 ; 2: normal walking; hold B to run (anywhere)
 ; 3: normal walking; hold B to run (only outdoors)
 ; (currently only options 0 and 1 are implemented)
-HACK_RUNNING_SHOES EQU 1
+HACK_RUNNING_SHOES EQU 0

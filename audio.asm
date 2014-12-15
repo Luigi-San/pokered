@@ -455,63 +455,76 @@ Music_Cities1AlternateTempo:: ; 0x9b81
 
 SECTION "Audio Engine 2", ROMX, BANK[AUDIO_2]
 
-Func_2136e:: ; 2136e (8:536e)
+Music_DoLowHealthAlarm:: ; 2136e (8:536e)
 	ld a, [wd083]
 	cp $ff
-	jr z, .asm_2139b
-	bit 7, a
-	ret z
+	jr z, .disableAlarm
+
+	bit 7, a  ;alarm enabled?
+	ret z     ;nope
+
 	and $7f
 	jr nz, .asm_21383
-	call Func_213a7
+	call .playToneHi
 	ld a, $1e
 	jr .asm_21395
-.asm_21383
+
+.asm_21383:
 	cp $14
 	jr nz, .asm_2138a
-	call Func_213ac
-.asm_2138a
+	call .playToneLo
+
+.asm_2138a:
 	ld a, $86
 	ld [wc02a], a
 	ld a, [wd083]
 	and $7f
 	dec a
-.asm_21395
+
+.asm_21395:
 	set 7, a
 	ld [wd083], a
 	ret
-.asm_2139b
+
+.disableAlarm:
 	xor a
-	ld [wd083], a
+	ld [wd083], a  ;disable alarm
 	ld [wc02a], a
-	ld de, Unknown_213c4 ; $53c4
-	jr asm_213af
+	ld de, .toneDataSilence ; $53c4
+	jr .playTone
 
-Func_213a7: ; 213a7 (8:53a7)
-	ld de, Unknown_213bc ; $53bc
-	jr asm_213af
+.playToneHi: ; 213a7 (8:53a7)
+	ld de, .toneDataHi ; $53bc
+	jr .playTone
 
-Func_213ac: ; 213ac (8:53ac)
-	ld de, Unknown_213c0 ; $53c0
-asm_213af: ; 213af (8:53af)
-	ld hl, $ff10
+.playToneLo: ; 213ac (8:53ac)
+	ld de, .toneDataLo ; $53c0
+
+;update sound channel 1 to play the alarm, overriding all other sounds.
+.playTone: ; 213af (8:53af)
+	ld hl, rNR10 ;channel 1 sound register
 	ld c, $5
 	xor a
-.asm_213b5
+
+.copyLoop:
 	ld [hli], a
 	ld a, [de]
 	inc de
 	dec c
-	jr nz, .asm_213b5
+	jr nz, .copyLoop
 	ret
 
-Unknown_213bc: ; 213bc (8:53bc)
+;bytes to write to sound channel 1 registers for health alarm.
+;starting at FF11 (FF10 is always zeroed), so these bytes are:
+;length, envelope, freq lo, freq hi
+.toneDataHi: ; 213bc (8:53bc)
 	db $A0,$E2,$50,$87
 
-Unknown_213c0: ; 213c0 (8:53c0)
+.toneDataLo: ; 213c0 (8:53c0)
 	db $B0,$E2,$EE,$86
 
-Unknown_213c4: ; 213c4 (8:53c4)
+;written to stop the alarm
+.toneDataSilence: ; 213c4 (8:53c4)
 	db $00,$00,$00,$80
 
 
