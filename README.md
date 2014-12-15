@@ -5,14 +5,15 @@ enhancement patches.
 
 Current enhancements available:
 
-* Increase walking speed
-* Press B to run (not working yet)
+* Increase walking speed (always, or only while holding B)
+* Disable low health alarm, or make it beep only a few times and then stop
 
 Planned enhancements:
 
 * Improvements to battle screen (more info about selected move, show "caught"
   indicator, etc)
-* Remove text delay
+* Remove/reduce text delay
+* Various menu improvements and bug fixes
 * Who knows?
 
 These patches can be toggled on/off by editing `hacks.asm`.

@@ -19,7 +19,7 @@ HACK_RUNNING_SHOES EQU 0
 ; 0: leave it alone
 ; 1: disable it completely
 ; 2: beep a few times then stop
-HACK_LOW_HEALTH_ALARM EQU 2
+HACK_LOW_HEALTH_ALARM EQU 0
 
 ;how many times to beep, with mode 2 (1 to 127)
 HACK_LOW_HEALTH_ALARM_COUNT EQU 3
