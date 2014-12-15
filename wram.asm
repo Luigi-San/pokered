@@ -985,7 +985,7 @@ W_BASECOORDY:: ; d082
 	ds 1
 
 ; low health alarm counter/enable
-wd083:: ds 1
+wLowHealthAlarm:: ds 1
 
 W_FBTILECOUNTER:: ; d084
 ; counts how many tiles of the current frame block have been drawn

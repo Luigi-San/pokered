@@ -365,7 +365,7 @@ SECTION "Audio Engine 1", ROMX, BANK[AUDIO_1]
 PlayBattleMusic:: ; 0x90c6
 	xor a
 	ld [wMusicHeaderPointer], a
-	ld [wd083], a
+	ld [wLowHealthAlarm], a
 	dec a
 	ld [wc0ee], a
 	call PlaySound ; stop music
@@ -456,7 +456,7 @@ Music_Cities1AlternateTempo:: ; 0x9b81
 SECTION "Audio Engine 2", ROMX, BANK[AUDIO_2]
 
 Music_DoLowHealthAlarm:: ; 2136e (8:536e)
-	ld a, [wd083]
+	ld a, [wLowHealthAlarm]
 	cp $ff
 	jr z, .disableAlarm
 
@@ -486,19 +486,19 @@ ENDC
 .asm_2138a:
 	ld a, $86
 	ld [wc02a], a ;disable sound channel?
-	ld a, [wd083]
+	ld a, [wLowHealthAlarm]
 	and $7f ;decrement alarm timer.
 	dec a
 
 .asm_21395:
 	; reset the timer and enable flag.
 	set 7, a
-	ld [wd083], a
+	ld [wLowHealthAlarm], a
 	ret
 
 .disableAlarm:
 	xor a
-	ld [wd083], a  ;disable alarm
+	ld [wLowHealthAlarm], a  ;disable alarm
 	ld [wc02a], a  ;re-enable sound channel?
 IF HACK_LOW_HEALTH_ALARM == 2
 	dec a

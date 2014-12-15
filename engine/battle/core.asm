@@ -941,7 +941,7 @@ EnemyMonFaintedText: ; 0x3c63e
 
 Func_3c643: ; 3c643 (f:4643)
 	xor a
-	ld [wd083], a ;disable low health alarm
+	ld [wLowHealthAlarm], a ;disable low health alarm
 	ld [wc02a], a
 IF HACK_LOW_HEALTH_ALARM == 2
 	ld [wLowHealthAlarmCount],a ;allow alarm to be turned back on
@@ -1086,7 +1086,7 @@ RemoveFaintedPlayerMon: ; 3c741 (f:4741)
 	predef FlagActionPredef ; clear gain exp flag for fainted mon
 	ld hl, W_ENEMYBATTSTATUS1
 	res 2, [hl]   ; reset "attacking multiple times" flag
-	ld a, [wd083]
+	ld a, [wLowHealthAlarm]
 	bit 7, a      ; skip sound flag (red bar (?))
 	jr z, .skipWaitForSound
 IF HACK_LOW_HEALTH_ALARM == 2
@@ -1094,7 +1094,7 @@ IF HACK_LOW_HEALTH_ALARM == 2
 	ld [wLowHealthAlarmCount],a ;allow alarm to be turned back on
 ENDC
 	ld a, $ff
-	ld [wd083], a ; disable low health alarm
+	ld [wLowHealthAlarm], a ; disable low health alarm
 	call WaitForSoundToFinish
 .skipWaitForSound
 	ld hl, wcd05
@@ -1933,7 +1933,7 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
 	cp $2
 	jr z, .asm_3cde6
 .asm_3cdd9
-	ld hl, wd083
+	ld hl, wLowHealthAlarm
 	bit 7, [hl] ;low health alarm enabled?
 	ld [hl], $0
 	ret z
@@ -1941,7 +1941,7 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
 	ld [wc02a], a
 	ret
 .asm_3cde6
-	ld hl, wd083
+	ld hl, wLowHealthAlarm
 IF HACK_LOW_HEALTH_ALARM == 2
 	ld a,[wLowHealthAlarmCount]
 	bit 7,a ;alarm already stopped?
