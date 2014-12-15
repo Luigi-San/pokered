@@ -858,8 +858,11 @@ ItemUseMedicine: ; dabb (3:5abb)
 	jp .cureStatusAilment
 .notFullHP ; if the pokemon's current HP doesn't equal its max HP
 	xor a
-	ld [wd083],a
+	ld [wd083],a ;disable low health alarm
 	ld [wc02a],a
+IF HACK_LOW_HEALTH_ALARM == 2
+	ld [wLowHealthAlarmCount],a ;allow alarm to be turned back on
+ENDC
 	push hl
 	push de
 	ld bc,32

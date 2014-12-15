@@ -162,7 +162,7 @@ Music8_PlayNextNote: ; 21946 (8:5946)
 	ld a, c
 	cp CH4
 	jr nz, .beginChecks
-	ld a, [wd083]
+	ld a, [wd083] ;low health alarm enabled?
 	bit 7, a
 	ret nz
 .beginChecks

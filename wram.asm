@@ -984,6 +984,7 @@ W_BASECOORDX:: ; d081
 W_BASECOORDY:: ; d082
 	ds 1
 
+; low health alarm counter/enable
 wd083:: ds 1
 
 W_FBTILECOUNTER:: ; d084
@@ -2095,6 +2096,13 @@ wBoxMon2:: ds box_struct_length * (MONS_PER_BOX + -1) ; dab7
 wBoxMonOT::    ds 11 * MONS_PER_BOX ; dd2a
 wBoxMonNicks:: ds 11 * MONS_PER_BOX ; de06
 wBoxMonNicksEnd:: ; dee2
+
+
+IF HACK_LOW_HEALTH_ALARM == 2
+;counter for how many times to play the alarm before silencing it.
+;high bit is a flag to prevent turning it back on.
+wLowHealthAlarmCount:: ds 1
+ENDC
 
 
 SECTION "Stack", WRAMX[$dfff], BANK[1]

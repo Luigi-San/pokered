@@ -463,25 +463,35 @@ Music_DoLowHealthAlarm:: ; 2136e (8:536e)
 	bit 7, a  ;alarm enabled?
 	ret z     ;nope
 
-	and $7f
-	jr nz, .asm_21383
+	and $7f   ;low 7 bits are the timer.
+	jr nz, .asm_21383 ;if timer > 0, play low tone.
+	
 	call .playToneHi
-	ld a, $1e
-	jr .asm_21395
+
+IF HACK_LOW_HEALTH_ALARM == 2
+	ld a,[wLowHealthAlarmCount]
+	dec a
+	ld [wLowHealthAlarmCount],a
+	jr z, .disableAlarm
+ENDC
+	
+	ld a, $1e ;keep this tone for 30 frames.
+	jr .asm_21395 ;reset the timer.
 
 .asm_21383:
 	cp $14
-	jr nz, .asm_2138a
-	call .playToneLo
+	jr nz, .asm_2138a ;if timer == 20,
+	call .playToneLo  ;actually set the sound registers.
 
 .asm_2138a:
 	ld a, $86
-	ld [wc02a], a
+	ld [wc02a], a ;disable sound channel?
 	ld a, [wd083]
-	and $7f
+	and $7f ;decrement alarm timer.
 	dec a
 
 .asm_21395:
+	; reset the timer and enable flag.
 	set 7, a
 	ld [wd083], a
 	ret
@@ -489,10 +499,16 @@ Music_DoLowHealthAlarm:: ; 2136e (8:536e)
 .disableAlarm:
 	xor a
 	ld [wd083], a  ;disable alarm
-	ld [wc02a], a
+	ld [wc02a], a  ;re-enable sound channel?
+IF HACK_LOW_HEALTH_ALARM == 2
+	dec a
+	ld [wLowHealthAlarmCount],a ;prevent alarm turning back on
+ENDC
 	ld de, .toneDataSilence ; $53c4
 	jr .playTone
 
+;update the sound registers to change the frequency.
+;the tone set here stays until we change it.
 .playToneHi: ; 213a7 (8:53a7)
 	ld de, .toneDataHi ; $53bc
 	jr .playTone

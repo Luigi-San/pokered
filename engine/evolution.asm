@@ -9,6 +9,9 @@ Func_7bde9: ; 7bde9 (1e:7de9)
 	xor a
 	ld [wd083], a
 	ld [wc02a], a
+IF HACK_LOW_HEALTH_ALARM == 2
+	ld [wLowHealthAlarmCount],a ;allow alarm to be turned back on
+ENDC
 	dec a
 	ld [wc0ee], a
 	call PlaySound
