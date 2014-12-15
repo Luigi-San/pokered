@@ -1,3 +1,23 @@
+# Pokémon Red and Blue - Enhancement Patches
+
+This is a fork of the Pokémon Red and Blue disassembly which adds some optional
+enhancement patches.
+
+Current enhancements available:
+
+* Increase walking speed
+* Press B to run (not working yet)
+
+Planned enhancements:
+
+* Improvements to battle screen (more info about selected move, show "caught"
+  indicator, etc)
+* Remove text delay
+* Who knows?
+
+Original disassembly follows...
+
+
 # Pokémon Red and Blue
 
 This is a disassembly of Pokémon Red and Blue.
