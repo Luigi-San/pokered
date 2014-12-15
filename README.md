@@ -15,6 +15,8 @@ Planned enhancements:
 * Remove text delay
 * Who knows?
 
+These patches can be toggled on/off by editing `hacks.asm`.
+
 Original readme follows...
 
 

@@ -262,21 +262,17 @@ OverworldLoopLessDelay::
 	ld hl,wFlags_0xcd60
 	res 2,[hl]
 
-IF DEF(HACK_WALK_FASTER_ALWAYS)
+IF HACK_RUNNING_SHOES == 1 ;always run
 	;do nothing. always go faster.
-	PRINTT "Hack enabled: HACK_WALK_FASTER_ALWAYS - "
-	PRINTT "increase walking speed (always)\n"
-	
-ELSE
-IF DEF(HACK_HOLD_B_TO_RUN)
-	PRINTT "Hack enabled: HACK_HOLD_B_TO_RUN - "
-	PRINTT "what it says on the tin\n"
-	FAIL "HACK_HOLD_B_TO_RUN is broken, don't use it.\n"
+ENDC
+IF HACK_RUNNING_SHOES >= 2 ;hold B to run
+	FAIL "Hold B To Run hack is broken, don't use it.\n"
 	
 	;if B held, skip bike check
 	;XXX this breaks if we mash B mid-step. maybe need to set a second "walk
 	;faster" flag like the bike does, which is updated only when starting a
 	;step.
+	;XXX if HACK_RUNNING_SHOES == 3, hold B to run only on maps that allow bike.
 	ld a,[hJoyInput]
 	and a,B_BUTTON
 	jr nz,.hackSkipBikeCheck
@@ -287,14 +283,13 @@ IF DEF(HACK_HOLD_B_TO_RUN)
 	jr nz,.normalPlayerSpriteAdvancement
 	
 .hackSkipBikeCheck
+ENDC
 
-ELSE
-	
+IF HACK_RUNNING_SHOES == 0 ;normal walking speed
 	;original game logic, go faster on bike only
 	ld a,[wWalkBikeSurfState]
 	dec a ; riding a bike?
 	jr nz,.normalPlayerSpriteAdvancement
-ENDC
 ENDC
 
 	;as painfully slow as ledge jumping is, speeding it up is not really

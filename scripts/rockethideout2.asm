@@ -318,7 +318,7 @@ RocketHideout2Script3: ; 44fc2 (11:4fc2)
 	ret
 
 LoadSpinnerArrowTiles: ; 44fd7 (11:4fd7)
-IF DEF(HACK_WALK_FASTER_ALWAYS)
+IF HACK_RUNNING_SHOES > 0
 	ret ;don't do the silly spin tile animation. it's super slow and makes the
 	;player character move slowly.
 ENDC
