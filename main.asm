@@ -1,4 +1,5 @@
 INCLUDE "constants.asm"
+INCLUDE "hacks.asm"
 
 NPC_SPRITES_1 EQU $4
 NPC_SPRITES_2 EQU $5
