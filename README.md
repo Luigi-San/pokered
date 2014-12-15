@@ -15,7 +15,7 @@ Planned enhancements:
 * Remove text delay
 * Who knows?
 
-Original disassembly follows...
+Original readme follows...
 
 
 # Pokémon Red and Blue
