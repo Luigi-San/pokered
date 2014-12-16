@@ -3057,13 +3057,23 @@ HackDrawBattleMoveInfo:
 	hlCoord 1, 8
 	predef Func_27d98
 	
-	;print move power
-	hlCoord 5, 9
-	ld de, W_PLAYERMOVEPOWER
+	;place a "-" for the move power
+	hlCoord 7, 9
+	ld [hl], "-"
+	dec hl
+	dec hl
+	
+	;print move power (replacing the "-") if nonzero
+	;(non-damaging moves have 0 power)
 	ld bc, $103 ;3 digits, no leading zeros
 	push bc ;save those flags
+	ld de, W_PLAYERMOVEPOWER
+	ld a, [de]
+	and a
+	jr z, .powerZero
 	call PrintNumber
 	
+.powerZero:
 	;compute the move's accuracy
 	ld hl,H_MULTIPLICAND
 	xor a
