@@ -16,7 +16,8 @@ Planned enhancements:
 * Various menu improvements and bug fixes
 * Who knows?
 
-These patches can be toggled on/off by editing `hacks.asm`.
+These patches can be toggled on/off by editing `hacks.asm`. With all patches
+disabled, the ROM builds identical to the original.
 
 Original readme follows...
 

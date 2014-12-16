@@ -2105,6 +2105,10 @@ IF HACK_LOW_HEALTH_ALARM == 2
 wLowHealthAlarmCount:: ds 1
 ENDC
 
+IF HACK_RUNNING_SHOES > 1
+wPlayerIsRunning:: ds 1
+ENDC
+
 
 SECTION "Stack", WRAMX[$dfff], BANK[1]
 wStack:: ; dfff

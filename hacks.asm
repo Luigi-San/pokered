@@ -10,9 +10,8 @@
 ; 0: normal (slow) walking speed.
 ; 1: fast walking (always run).
 ; 2: normal walking; hold B to run (anywhere)
-; 3: normal walking; hold B to run (only outdoors)
-; (currently only options 0 and 1 are implemented)
-HACK_RUNNING_SHOES EQU 0
+; 3: normal walking; hold B to run (only outdoors/on maps that allow biking)
+HACK_RUNNING_SHOES EQU 3
 
 
 ; hacks to deal with that stupid health alarm beep

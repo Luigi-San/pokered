@@ -176,6 +176,23 @@ OverworldLoopLessDelay::
 	ld a,[wd730]
 	bit 7,a ; are we simulating button presses?
 	jr nz,.noDirectionChange ; ignore direction changes if we are
+	
+IF HACK_RUNNING_SHOES >= 2 ;hold B to run
+	;set the "walk faster" flag if holding B while beginning a step.
+	IF HACK_RUNNING_SHOES == 3 ;run only on maps that allow biking
+		ccf
+		call IsBikeRidingAllowed
+		jr c, .hackRunningAllowed
+		xor a
+		jr .hackRunningNotAllowed
+.hackRunningAllowed:
+	ENDC
+	ld a,[hJoyInput]
+	and a,B_BUTTON
+.hackRunningNotAllowed:
+	ld [wPlayerIsRunning],a
+ENDC
+	
 	ld a,[wcc4b]
 	and a
 	jr z,.noDirectionChange
@@ -184,6 +201,7 @@ OverworldLoopLessDelay::
 	ld a,[wd529] ; old direction
 	cp b
 	jr z,.noDirectionChange
+	
 ; the code below is strange
 ; it computes whether or not the player did a 180 degree turn, but then overwrites the result
 ; also, it does a seemingly pointless loop afterwards
@@ -265,24 +283,21 @@ OverworldLoopLessDelay::
 IF HACK_RUNNING_SHOES == 1 ;always run
 	;do nothing. always go faster.
 ENDC
+
 IF HACK_RUNNING_SHOES >= 2 ;hold B to run
-	FAIL "Hold B To Run hack is broken, don't use it.\n"
-	
-	;if B held, skip bike check
-	;XXX this breaks if we mash B mid-step. maybe need to set a second "walk
-	;faster" flag like the bike does, which is updated only when starting a
-	;step.
-	;XXX if HACK_RUNNING_SHOES == 3, hold B to run only on maps that allow bike.
-	ld a,[hJoyInput]
-	and a,B_BUTTON
+	;if "walk faster" flag is set, use the bike speed.
+	;this flag is needed because if we just check if the B button is held here,
+	;pressing it mid-step will glitch the walk cycle.
+	ld a,[wPlayerIsRunning]
+	and a
 	jr nz,.hackSkipBikeCheck
 	
-	;original code, check if on bile
+	;original code, check if on bike
 	ld a,[wWalkBikeSurfState]
 	dec a ; riding a bike?
 	jr nz,.normalPlayerSpriteAdvancement
 	
-.hackSkipBikeCheck
+.hackSkipBikeCheck:
 ENDC
 
 IF HACK_RUNNING_SHOES == 0 ;normal walking speed
