@@ -2564,12 +2564,27 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 	ret z
 	ld hl, wBattleMonMoves
 	call .loadmoves
+
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	;draw the move selection textbox
+	hlCoord 0, 12
+	ld bc, $0412 ;$textbox 4 tall, $12 (18) wide
+	di
+	call TextBoxBorder
+	ei
+	hlCoord 2, 13 ;move the move list left.
+	call .writemoves
+	ld b, $1 ;move the cursor too.
+	ld a, $c
+	jr .menuset
+ELSE
+	;draw the move selection textbox
 	hlCoord 4, 12
 	ld b, $4
 	ld c, $e
-IF HACK_ENHANCE_BATTLE_SCREEN == 0
-	;no idea why this exists. it just draws a couple menu border tiles.
-	;the existing menu code does that just fine.
+	
+	;draw some border tiles for some reason
+	;maybe related to move info window
 	di
 	call TextBoxBorder
 	hlCoord 4, 12
@@ -2577,12 +2592,12 @@ IF HACK_ENHANCE_BATTLE_SCREEN == 0
 	hlCoord 10, 12
 	ld [hl], $7e
 	ei
-ENDC
 	hlCoord 6, 13
 	call .writemoves
 	ld b, $5
 	ld a, $c
 	jr .menuset
+ENDC
 .mimicmenu
 	ld hl, wEnemyMonMoves
 	call .loadmoves
@@ -2654,6 +2669,7 @@ ENDC
 .movelistindex1
 	ld [hl], a
 
+;press Select to swap moves
 Func_3d2fe: ; 3d2fe (f:52fe)
 	ld a, [wMoveMenuType]
 	and a
@@ -2672,7 +2688,11 @@ Func_3d2fe: ; 3d2fe (f:52fe)
 	ld a, [wMenuItemToSwap]
 	and a
 	jr z, .select
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	hlCoord 1, 13 ;move swap cursor
+ELSE
 	hlCoord 5, 13
+ENDC
 	dec a
 	ld bc, $14
 	call AddNTimes
@@ -2910,9 +2930,8 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	ld [H_AUTOBGTRANSFERENABLED], a
 IF HACK_ENHANCE_BATTLE_SCREEN == 1
 	;move and enlarge box to fit new content.
-	hlCoord 0, 7
-	ld b, $4 ;increase height
-	ld c, $8 ;reduce width to not overlap mon name
+	hlCoord 0, 8
+	ld bc, $0308 ;3 x 8 tiles (reduce width to not overlap mon name)
 ELSE
 	hlCoord 0, 8
 	ld b, $3
@@ -3013,8 +3032,6 @@ HackPowerText:
 	db "Pwr@"
 HackAccuracyText:
 	db "Acc@"
-HackPPText:
-	db "PP@"
 ENDC
 
 
@@ -3022,43 +3039,27 @@ ENDC
 IF HACK_ENHANCE_BATTLE_SCREEN == 1
 HackDrawBattleMoveInfo:
 	;print labels
-	hlCoord 1, 9
+	hlCoord 1, 10
 	ld de, HackPowerText
 	call PlaceString
-	hlCoord 1, 10
+	hlCoord 1, 11
 	ld de, HackAccuracyText
 	call PlaceString
-	hlCoord 1, 11
-	ld de, HackPPText
-	call PlaceString
 	
-	;print / between PP counts
-	hlCoord 6, 11
-	ld [hl], "/"
+	;ld a,THUNDER_WAVE
+	;ld [wBattleMonMoves+2],a
 	
 	;print % after accuracy
-	hlCoord 8, 10
+	hlCoord 8, 11
 	ld [hl], $EA ;unused Japanese letter tile; hack replaces it with a % sign
-	
-	;print current PP
-	hlCoord 4, 11
-	ld de, wcd6d
-	ld bc, $102
-	call PrintNumber
-	
-	;print max PP
-	hlCoord 7, 11
-	ld de, wd11e
-	ld bc, $102
-	call PrintNumber
-	
+
 	;print move type
 	call GetCurrentMove
-	hlCoord 1, 8
+	hlCoord 1, 9
 	predef Func_27d98
 	
 	;place a "-" for the move power
-	hlCoord 7, 9
+	hlCoord 7, 10
 	ld [hl], "-"
 	dec hl
 	dec hl
@@ -3101,9 +3102,97 @@ HackDrawBattleMoveInfo:
 	
 .noRound:
 	ld de,H_QUOTIENT + 3 ;lowest byte of quotient
-	hlCoord 5, 10
+	hlCoord 5, 11
 	pop bc ;re-use the flags from power
-	jp PrintNumber
+	call PrintNumber
+	
+	
+	;while we're here, let's also draw the total/remaining PP for each move.
+	;first we need to save some variables. maybe not all of these need to be
+	;saved, but just to be sure...
+	ld a,[wCurrentMenuItem]
+	ld b,a
+	ld a,[wWhichPokemon]
+	ld c,a
+	push bc
+	ld a,[wcc49]
+	push af
+	
+	ld bc,NUM_MOVES ;move counter
+	ld de,wBattleMonPP ;PrintNumber source
+	hlCoord 14, 13 ;PrintNumber dest
+.printPPloop:
+	push bc
+	
+	;is there even a move here?
+	push hl
+	ld hl,wBattleMonMoves
+	ld a,NUM_MOVES
+	sub a,c
+	ld c,a
+	add hl,bc
+	ld a,[hl]
+	pop hl
+	and a
+	jr z,.printPPloopNoMove
+	
+	;print the current PP
+	ld bc,$102 ;2 digits, no leading zeros
+	push de
+	call PrintNumber
+	
+	;print a / between current and max
+	ld [hl], "/"
+	inc hl
+	
+	;move DE to next move
+	pop de
+	inc de
+	
+	pop bc ;restore counter into bc, since we'll need it.
+	push bc ;and save it again
+	
+	;get the max PP
+	xor a
+	ld [wWhichPokemon],a
+	ld a,4
+	ld [wcc49],a ;use current in-battle Pokemon
+	;ld a,NUM_MOVES
+	sub a,c
+	ld [wCurrentMenuItem],a ;use this move
+	push de
+	push hl
+	push bc
+	callab GetMaxPP
+	pop bc
+	pop hl
+	
+	;print the max PP
+	ld de,wd11e
+	ld bc,$102 ;2 digits, no leading zeros
+	call PrintNumber
+	
+	;move HL to next row
+	ld e,15
+	ld d,0
+	add hl,de
+	pop de
+	
+.printPPloopNoMove:
+	pop bc
+	dec c  ;are we done?
+	jr nz, .printPPloop
+	
+	;restore those saved variables.
+	pop af
+	ld [wcc49],a
+	pop bc
+	ld a,b
+	ld [wCurrentMenuItem],a
+	ld a,c
+	ld [wWhichPokemon],a
+	
+	ret
 ENDC
 
 SelectEnemyMove: ; 3d564 (f:5564)
