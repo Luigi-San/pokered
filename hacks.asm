@@ -24,10 +24,15 @@ HACK_LOW_HEALTH_ALARM EQU 0
 HACK_LOW_HEALTH_ALARM_COUNT EQU 3
 
 
+; hacks to enhance the battle screen
+HACK_ENHANCE_BATTLE_SCREEN EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)
 ; * Start new game outside player's house
 ; * Hold B to prevent wild encounters
-; note that this hack might interfere with link battles.
+; note that this hack might interfere with link battles, because those turn
+; the debug mode off for some reason, but this hack forces it back on.
 HACK_ENABLE_DEBUG_MODE EQU 1

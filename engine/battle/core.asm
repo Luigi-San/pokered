@@ -2567,6 +2567,9 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 	hlCoord 4, 12
 	ld b, $4
 	ld c, $e
+IF HACK_ENHANCE_BATTLE_SCREEN == 0
+	;no idea why this exists. it just draws a couple menu border tiles.
+	;the existing menu code does that just fine.
 	di
 	call TextBoxBorder
 	hlCoord 4, 12
@@ -2574,6 +2577,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 	hlCoord 10, 12
 	ld [hl], $7e
 	ei
+ENDC
 	hlCoord 6, 13
 	call .writemoves
 	ld b, $5
@@ -2904,9 +2908,16 @@ SwapMovesInMenu: ; 3d435 (f:5435)
 Func_3d4b6: ; 3d4b6 (f:54b6)
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	;move and enlarge box to fit new content.
+	hlCoord 0, 7
+	ld b, $4 ;increase height
+	ld c, $8 ;reduce width to not overlap mon name
+ELSE
 	hlCoord 0, 8
 	ld b, $3
 	ld c, $9
+ENDC
 	call TextBoxBorder
 	ld a, [W_PLAYERDISABLEDMOVE]
 	and a
@@ -2947,38 +2958,143 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	ld a, [hl]
 	and $3f
 	ld [wcd6d], a
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	call HackDrawBattleMoveInfo
+ELSE
+	;print Type label
 	hlCoord 1, 9
 	ld de, TypeText
 	call PlaceString
+	
+	;print / between PP counts and after Type label
 	hlCoord 7, 11
 	ld [hl], "/"
 	hlCoord 5, 9
 	ld [hl], "/"
+	
+	;print current PP
 	hlCoord 5, 11
 	ld de, wcd6d
 	ld bc, $102
 	call PrintNumber
+	
+	;print max PP
 	hlCoord 8, 11
 	ld de, wd11e
 	ld bc, $102
 	call PrintNumber
+	
+	;print move type
 	call GetCurrentMove
 	hlCoord 2, 10
 	predef Func_27d98
+ENDC
 .asm_3d54e
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	jp Delay3
 
 DisabledText: ; 3d555 (f:5555)
-IF DEF(_YELLOW)
-	db "Disabled!@"
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	db "Disabled" ;no ! to fit box
 ELSE
-	db "disabled!@"
+	IF DEF(_YELLOW)
+		db "Disabled!@"
+	ELSE
+		db "disabled!@"
+	ENDC
 ENDC
 
 TypeText: ; 3d55f (f:555f)
 	db "TYPE@"
+	
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+HackPowerText:
+	db "Pwr@"
+HackAccuracyText:
+	db "Acc@"
+HackPPText:
+	db "PP@"
+ENDC
+
+
+;new battle screen code moved here to preserve 8-bit JRs
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+HackDrawBattleMoveInfo:
+	;print labels
+	hlCoord 1, 9
+	ld de, HackPowerText
+	call PlaceString
+	hlCoord 1, 10
+	ld de, HackAccuracyText
+	call PlaceString
+	hlCoord 1, 11
+	ld de, HackPPText
+	call PlaceString
+	
+	;print / between PP counts
+	hlCoord 6, 11
+	ld [hl], "/"
+	
+	;print % after accuracy
+	hlCoord 8, 10
+	ld [hl], $EA ;unused Japanese letter tile; hack replaces it with a % sign
+	
+	;print current PP
+	hlCoord 4, 11
+	ld de, wcd6d
+	ld bc, $102
+	call PrintNumber
+	
+	;print max PP
+	hlCoord 7, 11
+	ld de, wd11e
+	ld bc, $102
+	call PrintNumber
+	
+	;print move type
+	call GetCurrentMove
+	hlCoord 1, 8
+	predef Func_27d98
+	
+	;print move power
+	hlCoord 5, 9
+	ld de, W_PLAYERMOVEPOWER
+	ld bc, $103 ;3 digits, no leading zeros
+	push bc ;save those flags
+	call PrintNumber
+	
+	;compute the move's accuracy
+	ld hl,H_MULTIPLICAND
+	xor a
+	ld [hli],a
+	ld [hli],a
+	ld a,[W_PLAYERMOVEACCURACY]
+	ld [hli],a
+	ld [hl],100 ;multiply by 100
+	call Multiply
+	
+	;divide the result by 255
+	ld a,255
+	ld [H_DIVISOR],a
+	ld b,4 ;4 bytes in dividend
+	call Divide
+	
+	;round up
+	ld a,[H_REMAINDER]
+	bit 7,a        ;remainder >= 128, which means decimal part is >= 0.5
+	jr z,.noRound  ;if not, we don't round up
+	
+	ld a,[H_QUOTIENT + 3]
+	inc a
+	ld [H_QUOTIENT + 3],a
+	
+.noRound:
+	ld de,H_QUOTIENT + 3 ;lowest byte of quotient
+	hlCoord 5, 10
+	pop bc ;re-use the flags from power
+	jp PrintNumber
+ENDC
 
 SelectEnemyMove: ; 3d564 (f:5564)
 	ld a, [W_ISLINKBATTLE]
