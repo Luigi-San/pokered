@@ -1,4 +1,5 @@
 SetDefaultNames: ; 60ca (1:60ca)
+	;clear a lot of settings, but preserve W_OPTIONS, wd358, wd732
 	ld a, [wd358]
 	push af
 	ld a, [W_OPTIONS] ; W_OPTIONS
@@ -22,6 +23,8 @@ SetDefaultNames: ; 60ca (1:60ca)
 	ld a, [wd08a]
 	and a
 	call z, Func_5bff
+	
+	;set the default player names
 	ld hl, NintenText
 	ld de, wPlayerName ; wd158
 	ld bc, $b
@@ -54,8 +57,8 @@ OakSpeech: ; 6115 (1:6115)
 	xor a
 	ld [hTilesetType],a
 	ld a,[wd732]
-	bit 1,a ; XXX when is bit 1 set?
-	jp nz,Func_61bc ; easter egg: skip the intro
+	bit 1,a
+	jp nz,Func_61bc ; in debug mode, skip intro and keep default names
 	ld de,ProfOakPic
 	ld bc, (Bank(ProfOakPic) << 8) | $00
 	call IntroPredef3B   ; displays Oak pic?

@@ -121,11 +121,12 @@ MainMenu: ; 5af2 (1:5af2)
 	set 2,[hl] ; fly warp or dungeon warp
 	call SpecialWarpIn
 	jp SpecialEnterMap
+
 Func_5bff: ; 5bff (1:5bff)
 	ld a,1
 	ld [wd358],a
 	ld a,3
-	ld [W_OPTIONS],a
+	ld [W_OPTIONS],a ;set default options
 	ret
 
 LinkMenu: ; 5c0a (1:5c0a)
@@ -259,8 +260,8 @@ LinkMenu: ; 5c0a (1:5c0a)
 	call PrintText
 	ld c, $32
 	call DelayFrames
-	ld hl, wd732
-	res 1, [hl]
+	ld hl, wd732  ;disable debug mode (maybe because
+	res 1, [hl]   ;we're reusing wDestinationMap?)
 	ld a, [W_ANIMATIONID] ; W_ANIMATIONID
 	ld [wDestinationMap], a
 	call SpecialWarpIn
@@ -298,7 +299,7 @@ LinkCanceledText: ; 5d4d (1:5d4d)
 
 Func_5d52: ; 5d52 (1:5d52)
 	ld hl, wd732
-	res 1, [hl]
+	res 1, [hl] ;disable debug mode
 	call OakSpeech
 	ld c, $14
 	call DelayFrames

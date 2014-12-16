@@ -536,6 +536,7 @@ SpriteCollisionBitTable:
 	db %01000000,%00000000
 	db %10000000,%00000000
 
+;unused "battle test" function
 TestBattle:
 	ret
 
@@ -650,7 +651,7 @@ LoadSpecialWarpData: ; 62ff (1:62ff)
 .notTradeCenter
 	ld a, [wd732]
 	bit 1, a
-	jr nz, .notFirstMap
+	jr nz, .notFirstMap ;in debug mode, start game outside player's house.
 	bit 2, a
 	jr nz, .notFirstMap
 	ld hl, FirstMapSpec

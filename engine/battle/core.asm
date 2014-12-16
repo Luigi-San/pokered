@@ -6771,7 +6771,7 @@ asm_3ef23: ; 3ef23 (f:6f23)
 	ld a, [wd732]
 	bit 1, a
 	jr z, .asm_3ef2f
-	ld a, [hJoyHeld]
+	ld a, [hJoyHeld] ;in debug mode, if B held, skip random encounters.
 	bit 1, a ; B button pressed?
 	ret nz
 .asm_3ef2f
