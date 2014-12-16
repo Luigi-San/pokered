@@ -24,7 +24,13 @@ HACK_LOW_HEALTH_ALARM EQU 0
 HACK_LOW_HEALTH_ALARM_COUNT EQU 3
 
 
-; hacks to enhance the battle screen
+; hack to enhance the battle screen:
+; * Display power and accuracy of selected move.
+; * Display PP of all moves.
+; Planned enhancements:
+; * Display "caught" indicator next to opponent
+; * EXP bars
+; * Display a move's category (physical/special/status)
 HACK_ENHANCE_BATTLE_SCREEN EQU 1
 
 
@@ -35,4 +41,5 @@ HACK_ENHANCE_BATTLE_SCREEN EQU 1
 ; * Hold B to prevent wild encounters
 ; note that this hack might interfere with link battles, because those turn
 ; the debug mode off for some reason, but this hack forces it back on.
+; probably this has to do with them re-using the "destination map" variable.
 HACK_ENABLE_DEBUG_MODE EQU 1

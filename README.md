@@ -7,11 +7,11 @@ Current enhancements available:
 
 * Increase walking speed (always, or only while holding B)
 * Disable low health alarm, or make it beep only a few times and then stop
+* Improvements to battle screen (more info about selected move, show "caught"
+  indicator, etc)
 
 Planned enhancements:
 
-* Improvements to battle screen (more info about selected move, show "caught"
-  indicator, etc)
 * Remove/reduce text delay
 * Various menu improvements and bug fixes
 * Who knows?
