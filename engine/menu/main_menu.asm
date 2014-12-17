@@ -731,7 +731,7 @@ HackNewDebugMenu:
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	
-	ld a, 4 ;# options - 1
+	ld a, 5 ;# options - 1
 	ld [wMaxMenuItem],a
 	
 	call ClearScreen
@@ -976,6 +976,12 @@ HackNewDebugMenu:
 	ld [W_CUROPPONENT], a
 	jp CloseStartMenu
 	
+
+.funcHealParty:
+	predef HealParty
+	ld a,(SFX_02_3e - SFX_Headers_02) / 3 ; status ailment curing sound
+	call PlaySound
+	jp .menuInit
 	
 .funcGiveMoney:
 	ld a,$99
@@ -1008,6 +1014,7 @@ HackNewDebugMenu:
 	dw .funcGotoMap
 	dw .funcGiveItem
 	dw .funcGiveMon
+	dw .funcHealParty
 	dw .funcGiveMoney
 	dw .funcOpenPC
 
@@ -1017,6 +1024,7 @@ HackNewDebugMenu:
 	db   "Go to map:"
 	next "Give Item:"
 	next "Give Mon:"
+	next "Heal Party"
 	next "Give Money"
 	next "Open PC@"
 	
@@ -1026,8 +1034,6 @@ HackNewDebugMenu:
 	
 ;other interesting functions/thoughts:
 ;PrintPredefTextID
-;Func_74ea (bank 1) - some kind of menu, what is it?
-;IsPlayerStandingOnWarp, IsWarpTileInFrontOfPlayer, IsPlayerStandingOnDoorTileOrWarpTile
 ;heal party (HealParty, but not exported)
 ;give/edit badges (W_OBTAINEDBADGES)
 ;a sound test submenu would be great
