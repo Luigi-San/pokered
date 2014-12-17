@@ -714,6 +714,7 @@ HackNewDebugMenu:
 	
 	;init menu, or re-init after using an option
 .menuInit:
+	call WaitForSoundToFinish
 	xor a
 	ld [wCurrentMenuItem],a
 	ld [wLastMenuItem],a
@@ -726,7 +727,7 @@ HackNewDebugMenu:
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	
-	ld a, 2 ;# options - 1
+	ld a, 3 ;# options - 1
 	ld [wMaxMenuItem],a
 	
 	call ClearScreen
@@ -875,13 +876,11 @@ HackNewDebugMenu:
 	;play "deposit item" sound.
 	ld a,(SFX_02_55 - SFX_Headers_02) / 3
 	call PlaySound
-	call WaitForSoundToFinish
 	jp .menuInit
 	
 .giveItemFail:
 	ld a,(SFX_02_46 - SFX_Headers_02) / 3
 	call PlaySound
-	call WaitForSoundToFinish
 	jp .menuInit
 	
 	
@@ -916,6 +915,21 @@ HackNewDebugMenu:
 	ld [W_CUROPPONENT], a
 	jp CloseStartMenu
 	
+	
+.funcGiveMoney:
+	ld a,$99
+	ld hl,wPlayerMoney
+	ld [hli],a
+	ld [hli],a
+	ld [hli],a
+	ld hl,wPlayerCoins
+	ld [hli],a
+	ld [hli],a
+	
+	ld a,(SFX_02_5a - SFX_Headers_02) / 3
+	call PlaySound
+	jp .menuInit
+	
 
 	;"Open PC" function
 .funcOpenPC:
@@ -932,6 +946,7 @@ HackNewDebugMenu:
 .menuOptionPtrs:
 	dw .funcGiveItem
 	dw .funcGiveMon
+	dw .funcGiveMoney
 	dw .funcOpenPC
 
 	
@@ -939,6 +954,7 @@ HackNewDebugMenu:
 .menuText:
 	db   "Give Item:"
 	next "Give Mon:"
+	next "Give Money"
 	next "Open PC@"
 	
 .questionText:
