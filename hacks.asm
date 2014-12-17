@@ -11,7 +11,15 @@
 ; 1: fast walking (always run).
 ; 2: normal walking; hold B to run (anywhere)
 ; 3: normal walking; hold B to run (only outdoors/on maps that allow biking)
-HACK_RUNNING_SHOES EQU 1
+HACK_RUNNING_SHOES EQU 0
+
+
+
+;speed up EVERYTHING on the overworld, including NPCs.
+; 0: normal speed
+; 1: high speed
+; 2: ludicrous speed
+HACK_SPEED_UP_OVERWORLD EQU 1
 
 
 ; hacks to deal with that stupid health alarm beep
@@ -52,3 +60,7 @@ HACK_WALK_THROUGH_WALLS EQU 1
 
 ;enable a new debug menu (not in the original program)
 HACK_NEW_DEBUG_MENU EQU 1
+
+
+;skip the intro and boot directly to the title screen
+HACK_SKIP_INTRO EQU 1

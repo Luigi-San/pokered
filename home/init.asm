@@ -110,7 +110,9 @@ rLCDC_DEFAULT EQU %11100011
 IF HACK_NEW_DEBUG_MENU == 1
 	callab HackNewDebugMenu_Init
 ENDC
+IF HACK_SKIP_INTRO == 0
 	predef PlayIntro
+ENDC
 
 	call DisableLCD
 	call ClearVram

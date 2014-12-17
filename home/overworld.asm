@@ -41,9 +41,13 @@ EnterMap::
 	ld [wJoyIgnore], a
 
 OverworldLoop::
+IF HACK_SPEED_UP_OVERWORLD < 1
 	call DelayFrame
+ENDC
 OverworldLoopLessDelay::
+IF HACK_SPEED_UP_OVERWORLD < 2
 	call DelayFrame
+ENDC
 	call LoadGBPal
 	ld a,[wd736]
 	bit 6,a ; jumping down a ledge?
