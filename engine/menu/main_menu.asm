@@ -709,10 +709,14 @@ HackNewDebugMenu:
 	xor a
 	ld [wCurrentMenuItem],a
 	ld [wLastMenuItem],a
+	
 	inc a
 	ld [wTopMenuItemX],a
 	ld [wTopMenuItemY],a
-	ld [wHackDebugMenuWhichItem],a
+	ld hl,wHackDebugMenuWhichItem
+	ld [hli],a
+	ld [hli],a
+	
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	ld a,1 ;# options - 1
@@ -778,11 +782,13 @@ HackNewDebugMenu:
 	;redraw the menu
 .redraw:
 	call LoadScreenTilesFromBuffer2 ;refresh screen
-	
+
+	;draw border
 	hlCoord 0, 0
-	ld bc, $0312 ; 3 x 18
+	ld bc, $0412 ; 4 x 18
 	call TextBoxBorder
 	
+	;draw menu text
 	hlCoord 2, 1
 	ld de, .menuText
 	call PlaceString
@@ -809,6 +815,30 @@ HackNewDebugMenu:
 	ld [wd11e],a
 	call GetItemName
 	hlCoord 3, 2
+	ld de, wcd6d
+	call PlaceString
+	
+	
+	;update mon name and ID
+	hlCoord 13, 1
+	ld de, wHackDebugMenuWhichMon
+	ld bc, $8103 ;one byte, 3 digits, with leading zeros
+	call PrintNumber
+	
+	;don't attempt to print the names of invalid mons
+	ld a,[wHackDebugMenuWhichMon]
+	and a
+	jr z, .invalidMon
+	cp VICTREEBEL+1
+	jr c,.validMon
+	
+.invalidMon:
+	ld a,0
+	
+.validMon:
+	ld [wd11e],a
+	call GetMonName
+	hlCoord 3, 4
 	ld de, wcd6d
 	call PlaceString
 	ret
@@ -841,17 +871,34 @@ HackNewDebugMenu:
 	call PlaySound
 	call WaitForSoundToFinish
 	jp .menuMainLoop
+	
+	
+;"Give Mon" function
+.funcGiveMon:
+	ld a,100
+	ld [wcf97],a ;max quantity (level)
+	call DisplayChooseQuantityMenu
+	
+	;give the mon
+	cp $FF
+	jp z, .menuMainLoop ;cancelled
+	ld a,[wcf96] ;selected quantity
+	ld c,a
+	ld a,[wHackDebugMenuWhichMon]
+	ld b,a
+	call GivePokemon ;does sound effect, text, nickname etc
+	jp .menuMainLoop
 
 	
 	;Function pointers for each item
 .menuOptionPtrs:
 	dw .funcGiveItem
-	dw .funcGiveItem
+	dw .funcGiveMon
 	
 	
 	;Item text
 .menuText:
 	db   "Give Item:"
-	next "More Crap:@"
+	next "Give Mon:@"
 	
 ENDC
