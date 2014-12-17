@@ -11,7 +11,7 @@
 ; 1: fast walking (always run).
 ; 2: normal walking; hold B to run (anywhere)
 ; 3: normal walking; hold B to run (only outdoors/on maps that allow biking)
-HACK_RUNNING_SHOES EQU 0
+HACK_RUNNING_SHOES EQU 1
 
 
 
@@ -19,7 +19,7 @@ HACK_RUNNING_SHOES EQU 0
 ; 0: normal speed
 ; 1: high speed
 ; 2: ludicrous speed
-HACK_SPEED_UP_OVERWORLD EQU 1
+HACK_SPEED_UP_OVERWORLD EQU 0
 
 
 ; hacks to deal with that stupid health alarm beep

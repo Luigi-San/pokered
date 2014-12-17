@@ -9,6 +9,8 @@ Current enhancements available:
 * Disable low health alarm, or make it beep only a few times and then stop
 * Improvements to battle screen (more info about selected move, show "caught"
   indicator, etc)
+* Debugging functions (debug menu, walk through walls, no random battles)
+* Skip intro
 
 Planned enhancements:
 
