@@ -2110,11 +2110,17 @@ wPlayerIsRunning:: ds 1
 ENDC
 
 IF HACK_NEW_DEBUG_MENU == 1
+wHackDebugMenuCursor::     ds 1 ;saved cursor position
 ;one byte per debug menu option
 wHackDebugMenuItems::
-wHackDebugMenuWhichMap::  ds 1
-wHackDebugMenuWhichItem:: ds 1
-wHackDebugMenuWhichMon::  ds 1
+wHackDebugMenuWhichUse::   ds 1
+wHackDebugMenuWhichMap::   ds 1
+wHackDebugMenuWhichItem::  ds 1
+wHackDebugMenuWhichMon::   ds 1
+wHackDebugMenuDummy1::     ds 1 ;unused # for "heal party"
+wHackDebugMenuDummy2::     ds 1 ;unused # for "give money"
+wHackDebugMenuDummy3::     ds 1 ;unused # for "open PC"
+wHackDebugMenuWhichSound:: ds 1
 ENDC
 
 

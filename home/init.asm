@@ -107,6 +107,9 @@ rLCDC_DEFAULT EQU %11100011
 	dec a
 	ld [wUpdateSpritesEnabled], a
 
+IF HACK_NEW_DEBUG_MENU == 1
+	callab HackNewDebugMenu_Init
+ENDC
 	predef PlayIntro
 
 	call DisableLCD

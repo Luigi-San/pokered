@@ -702,16 +702,30 @@ Func_609e: ; 609e (1:609e)
 
 
 IF HACK_NEW_DEBUG_MENU == 1
-HackNewDebugMenu:
-	;ld a,(SFX_02_40 - SFX_Headers_02) / 3
-	;call PlaySound ; play sound
-	
-	ld a,1
+DEBUG_MENU_NUM_OPTIONS EQU 8
+HackNewDebugMenu_Init:: ;init at power-on
+	push af
+	push bc
+	push hl
+	xor a
+	ld [wHackDebugMenuCursor],a
+	inc a
 	ld hl,wHackDebugMenuItems
+	ld c, DEBUG_MENU_NUM_OPTIONS
+.initCountersLoop:
 	ld [hli],a
-	ld [hli],a
-	ld [hli],a
+	dec c
+	jr nz,.initCountersLoop
 	
+	xor a
+	ld [wHackDebugMenuWhichUse],a
+	pop hl
+	pop bc
+	pop af
+	ret
+	
+
+HackNewDebugMenu:: ;show the menu
 	ld a,[W_CURMAP]
 	ld [wHackDebugMenuWhichMap],a
 	
@@ -720,7 +734,6 @@ HackNewDebugMenu:
 .menuInit:
 	call WaitForSoundToFinish
 	xor a
-	ld [wCurrentMenuItem],a
 	ld [wLastMenuItem],a
 	
 	inc a
@@ -731,8 +744,10 @@ HackNewDebugMenu:
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	
-	ld a, 5 ;# options - 1
+	ld a, DEBUG_MENU_NUM_OPTIONS - 1
 	ld [wMaxMenuItem],a
+	ld a,[wHackDebugMenuCursor]
+	ld [wCurrentMenuItem],a
 	
 	call ClearScreen
 	
@@ -743,6 +758,9 @@ HackNewDebugMenu:
 	call HandleMenuInput
 	push af
 	call WaitForSoundToFinish
+	
+	ld a,[wCurrentMenuItem]
+	ld [wHackDebugMenuCursor],a ;save cursor
 	pop af
 	
 	bit 0,a ;A button pressed?
@@ -806,7 +824,7 @@ HackNewDebugMenu:
 	call PlaceString
 	
 	;draw current map and coords below "goto map"
-	hlCoord 3, 2
+	hlCoord 3, 4
 	ld de,W_CURMAP
 	ld bc, $8103 ;one byte, 3 digits, with leading zeros
 	call PrintNumber
@@ -818,7 +836,7 @@ HackNewDebugMenu:
 	call PrintNumber
 	
 	;draw IDs for items that have them.
-	ld c, 3
+	ld c, DEBUG_MENU_NUM_OPTIONS
 	hlCoord 13, 1
 	ld de, wHackDebugMenuItems
 .redrawNumLoop:
@@ -851,7 +869,7 @@ HackNewDebugMenu:
 .validItem:
 	ld [wd11e],a
 	call GetItemName
-	hlCoord 3, 4
+	hlCoord 3, 6
 	ld de, wcd6d
 	call PlaceString
 	
@@ -873,9 +891,31 @@ HackNewDebugMenu:
 	ld de, wcd6d
 	
 .printMon:
-	hlCoord 3, 6
+	hlCoord 3, 8
 	call PlaceString
-	ret
+	
+
+.drawUseText:
+	ld a,[wHackDebugMenuWhichUse]
+	cp 3
+	jr c,.useTextOK
+	ld de,.questionText
+	jr .useTextWriteString
+	
+.useTextOK:
+	ld hl, .useThingText-9
+	ld bc, 9
+	inc a
+.mult:
+	add hl,bc
+	dec a
+	jr nz,.mult
+	
+	ld d,h
+	ld e,l
+.useTextWriteString:
+	hlCoord 3, 2
+	jp PlaceString
 	
 	
 	;"Go to map" function
@@ -996,7 +1036,36 @@ HackNewDebugMenu:
 	ld [W_CUROPPONENT], a
 	jp CloseStartMenu
 	
+	
+.funcUseThing:
+	;ld a,(SFX_02_59 - SFX_Headers_02) / 3
+	ld a,158 ;"ball placed on healing machine" sound
+	call PlaySound
+	ld a,[wHackDebugMenuWhichUse]
+	and a
+	jr z, .useRepel
+	dec a
+	jr z, .useStrength
+	dec a
+	jr z,.useFlash
+	jp .menuInit
+	
+.useRepel:
+	ld a,255
+	ld [wd0db],a
+	jp .menuInit
 
+.useStrength:
+	ld hl,wd728
+	set 0,[hl]
+	jp .menuInit
+
+.useFlash:
+	xor a
+	ld [wMapPalOffset],a
+	jp .menuInit
+	
+	
 .funcHealParty:
 	predef HealParty
 	ld a,(SFX_02_3e - SFX_Headers_02) / 3 ; status ailment curing sound
@@ -1027,33 +1096,49 @@ HackNewDebugMenu:
 	;if I save that and restore it after calling the PC,
 	;the game will actually crash, which makes no goddamn sense.
 	;even with this, the start menu doesn't actually close.
+
+	
+.funcPlaySound:
+	ld a,[wHackDebugMenuWhichSound]
+	call PlaySound
+	jp .menuInit
 	
 	
 	;Function pointers for each item
 .menuOptionPtrs:
+	dw .funcUseThing
 	dw .funcGotoMap
 	dw .funcGiveItem
 	dw .funcGiveMon
 	dw .funcHealParty
 	dw .funcGiveMoney
 	dw .funcOpenPC
+	dw .funcPlaySound
 
 	
 	;Item text
 .menuText:
-	db   "Go to map:"
+	db   "Use:"
+	next "Go to map:"
 	next "Give Item:"
 	next "Give Mon:"
 	next "Heal Party"
 	next "Give Money"
-	next "Open PC@"
+	next "Open PC"
+	next "Play Sound"
+	db "@" ;end text
 	
 .questionText:
 	db "?????@"
 	
+.useThingText:
+	db "Repel   @"
+	db "Strength@"
+	db "Flash   @"
+	
 	
 ;other interesting functions/thoughts:
 ;give/edit badges (W_OBTAINEDBADGES)
-;a sound test submenu would be great
+;edit W_MISSABLEOBJECTLIST, W_GAMEPROGRESSFLAGS
 	
 ENDC
