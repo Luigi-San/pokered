@@ -78,6 +78,11 @@ RedisplayStartMenu:: ; 2adf (0:2adf)
 	cp a,5
 	jp z,StartMenu_Option
 
+IF HACK_NEW_DEBUG_MENU == 1
+	callab HackNewDebugMenu ;replace Exit option
+	jp RedisplayStartMenu
+ENDC
+
 ; EXIT falls through to here
 CloseStartMenu:: ; 2b70 (0:2b70)
 	call Joypad

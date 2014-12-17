@@ -699,3 +699,159 @@ Func_609e: ; 609e (1:609e)
 	ld [$6000], a
 	scf
 	ret
+
+
+IF HACK_NEW_DEBUG_MENU == 1
+HackNewDebugMenu:
+	;ld a,(SFX_02_40 - SFX_Headers_02) / 3
+	;call PlaySound ; play sound
+	
+	xor a
+	ld [wCurrentMenuItem],a
+	ld [wLastMenuItem],a
+	inc a
+	ld [wTopMenuItemX],a
+	ld [wTopMenuItemY],a
+	ld [wHackDebugMenuWhichItem],a
+	ld a,$FF
+	ld [wMenuWatchedKeys],a ;handle all buttons
+	ld a,1 ;# options - 1
+	ld [wMaxMenuItem],a
+	
+	;menu main loop while open
+.menuMainLoop:
+	call .redraw
+	call HandleMenuInput
+	push af
+	call WaitForSoundToFinish
+	pop af
+	
+	bit 0,a ;A button pressed?
+	jr nz, .activate
+	
+	bit 1,a ;B pressed?
+	jp nz, CloseStartMenu
+	
+	bit 4,a ;Right pressed?
+	jr nz, .increment
+	
+	bit 5,a ;Left pressed?
+	jr nz, .decrement
+	
+	jr .menuMainLoop
+	
+	;activate the selected option
+.activate:
+	ld a,[wCurrentMenuItem]
+	sla a
+	ld c,a
+	ld b,0
+	ld hl,.menuOptionPtrs
+	add hl,bc
+	ld a,[hli]
+	ld h,[hl]
+	ld l,a
+	jp [hl]
+	jr .menuMainLoop
+	
+
+	;increment selected option
+.increment:
+	ld e,1
+	jr .incdec
+
+	;decrement selected option
+.decrement:
+	ld e,$FF
+
+.incdec:
+	ld a,[wCurrentMenuItem]
+	ld c,a
+	ld b,0
+	ld hl,wHackDebugMenuWhichItem
+	add hl,bc
+	ld a,[hl]
+	add e
+	ld [hl],a
+	jr .menuMainLoop
+
+	;redraw the menu
+.redraw:
+	call LoadScreenTilesFromBuffer2 ;refresh screen
+	
+	hlCoord 0, 0
+	ld bc, $0312 ; 3 x 18
+	call TextBoxBorder
+	
+	hlCoord 2, 1
+	ld de, .menuText
+	call PlaceString
+	
+	;update item name and ID
+	hlCoord 13, 1
+	ld de, wHackDebugMenuWhichItem
+	ld bc, $8103 ;one byte, 3 digits, with leading zeros
+	call PrintNumber
+	
+	;don't attempt to print the names of invalid items
+	ld a,[wHackDebugMenuWhichItem]
+	and a
+	jr z, .invalidItem
+	cp MAX_ELIXER+1
+	jr c,.validItem
+	cp HM_01
+	jr nc,.validItem
+	
+.invalidItem:
+	ld a,$2C ;"?????"
+	
+.validItem:
+	ld [wd11e],a
+	call GetItemName
+	hlCoord 3, 2
+	ld de, wcd6d
+	call PlaceString
+	ret
+	
+	
+	;"Give Item" function
+.funcGiveItem:
+	ld a,99
+	ld [wcf97],a ;max quantity
+	call DisplayChooseQuantityMenu
+	
+	;give the item
+	cp $FF
+	jp z, .menuMainLoop ;cancelled
+	ld a,[wcf96] ;selected quantity
+	ld c,a
+	ld a,[wHackDebugMenuWhichItem]
+	ld b,a
+	call GiveItem
+	jr nc, .giveItemFail
+	
+	;play "deposit item" sound.
+	ld a,(SFX_02_55 - SFX_Headers_02) / 3
+	call PlaySound
+	call WaitForSoundToFinish
+	jp .menuMainLoop
+	
+.giveItemFail:
+	ld a,(SFX_02_46 - SFX_Headers_02) / 3
+	call PlaySound
+	call WaitForSoundToFinish
+	jp .menuMainLoop
+
+	
+	;Function pointers for each item
+.menuOptionPtrs:
+	dw .funcGiveItem
+	dw .funcGiveItem
+	
+	
+	;Item text
+.menuText:
+	db   "Give Item:"
+	next "More Crap:@"
+	
+ENDC

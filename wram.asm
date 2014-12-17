@@ -2109,6 +2109,11 @@ IF HACK_RUNNING_SHOES > 1
 wPlayerIsRunning:: ds 1
 ENDC
 
+IF HACK_NEW_DEBUG_MENU == 1
+;one byte per debug menu option
+wHackDebugMenuWhichItem:: ds 1
+ENDC
+
 
 SECTION "Stack", WRAMX[$dfff], BANK[1]
 wStack:: ; dfff

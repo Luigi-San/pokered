@@ -48,3 +48,7 @@ HACK_ENABLE_DEBUG_MODE EQU 1
 
 ;hold B to walk through walls.
 HACK_WALK_THROUGH_WALLS EQU 1
+
+
+;enable a new debug menu (not in the original program)
+HACK_NEW_DEBUG_MENU EQU 1
