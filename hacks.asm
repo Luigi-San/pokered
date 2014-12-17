@@ -44,3 +44,7 @@ HACK_ENHANCE_BATTLE_SCREEN EQU 1
 ; the debug mode off for some reason, but this hack forces it back on.
 ; probably this has to do with them re-using the "destination map" variable.
 HACK_ENABLE_DEBUG_MODE EQU 1
+
+
+;hold B to walk through walls.
+HACK_WALK_THROUGH_WALLS EQU 1
