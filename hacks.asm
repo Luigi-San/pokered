@@ -11,14 +11,14 @@
 ; 1: fast walking (always run).
 ; 2: normal walking; hold B to run (anywhere)
 ; 3: normal walking; hold B to run (only outdoors/on maps that allow biking)
-HACK_RUNNING_SHOES EQU 0
+HACK_RUNNING_SHOES EQU 1
 
 
 ; hacks to deal with that stupid health alarm beep
 ; 0: leave it alone
 ; 1: disable it completely
 ; 2: beep a few times then stop
-HACK_LOW_HEALTH_ALARM EQU 0
+HACK_LOW_HEALTH_ALARM EQU 2
 
 ;how many times to beep, with mode 2 (1 to 127)
 HACK_LOW_HEALTH_ALARM_COUNT EQU 3
@@ -27,8 +27,8 @@ HACK_LOW_HEALTH_ALARM_COUNT EQU 3
 ; hack to enhance the battle screen:
 ; * Display power and accuracy of selected move.
 ; * Display PP of all moves.
-; Planned enhancements:
 ; * Display "caught" indicator next to opponent
+; Planned enhancements:
 ; * EXP bars
 ; * Display a move's category (physical/special/status)
 HACK_ENHANCE_BATTLE_SCREEN EQU 1

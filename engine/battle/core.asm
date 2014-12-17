@@ -1911,7 +1911,11 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
 	ld de, wcf9c
 	call PrintStatusConditionNotFainted
 	pop hl
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	hlCoord 11, 8
+ELSE
 	jr nz, .asm_3cdae
+ENDC
 	call PrintLevel
 .asm_3cdae
 	ld a, [wcf98]
@@ -1987,13 +1991,21 @@ ENDC
 	hlCoord 1, 0
 	call CenterMonName
 	call PlaceString
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	hlCoord 5, 1
+ELSE
 	hlCoord 4, 1
+ENDC
 	push hl
 	inc hl
 	ld de, wEnemyMonStatus
 	call PrintStatusConditionNotFainted
 	pop hl
+IF HACK_ENHANCE_BATTLE_SCREEN == 0
 	jr nz, .skipPrintLevel ; if the mon has a status condition, skip printing the level
+ELSE
+	hlCoord 2, 1
+ENDC
 	ld a, [wEnemyMonLevel]
 	ld [wcfb9], a
 	call PrintLevel
@@ -3067,8 +3079,19 @@ HackDrawBattleMoveInfo:
 	ld de, HackAccuracyText
 	call PlaceString
 	
-	;ld a,THUNDER_WAVE
-	;ld [wBattleMonMoves+2],a
+	;temporary patch to give us more moves to test with
+	;and boost levels to test HUD
+	ld a,THUNDER_WAVE
+	ld hl,wBattleMonMoves+2
+	ld [hli],a
+	ld [hl],REST
+	ld a,$FF
+	ld hl,wBattleMonPP+2
+	ld [hli],a
+	ld [hli],a
+	ld a,100
+	ld [wBattleMonLevel],a
+	ld [wEnemyMonLevel],a
 	
 	;print % after accuracy
 	hlCoord 8, 11
