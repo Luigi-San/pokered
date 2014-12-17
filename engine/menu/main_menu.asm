@@ -706,6 +706,14 @@ HackNewDebugMenu:
 	;ld a,(SFX_02_40 - SFX_Headers_02) / 3
 	;call PlaySound ; play sound
 	
+	ld a,1
+	ld hl,wHackDebugMenuWhichItem
+	ld [hli],a
+	ld [hli],a
+	
+	
+	;init menu, or re-init after using an option
+.menuInit:
 	xor a
 	ld [wCurrentMenuItem],a
 	ld [wLastMenuItem],a
@@ -713,12 +721,10 @@ HackNewDebugMenu:
 	inc a
 	ld [wTopMenuItemX],a
 	ld [wTopMenuItemY],a
-	ld hl,wHackDebugMenuWhichItem
-	ld [hli],a
-	ld [hli],a
 	
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
+	
 	ld a,1 ;# options - 1
 	ld [wMaxMenuItem],a
 	
@@ -756,7 +762,6 @@ HackNewDebugMenu:
 	ld h,[hl]
 	ld l,a
 	jp [hl]
-	jr .menuMainLoop
 	
 
 	;increment selected option
@@ -820,7 +825,7 @@ HackNewDebugMenu:
 	
 	
 	;update mon name and ID
-	hlCoord 13, 1
+	hlCoord 13, 3
 	ld de, wHackDebugMenuWhichMon
 	ld bc, $8103 ;one byte, 3 digits, with leading zeros
 	call PrintNumber
@@ -833,13 +838,16 @@ HackNewDebugMenu:
 	jr c,.validMon
 	
 .invalidMon:
-	ld a,0
+	ld de,.questionText
+	jr .printMon
 	
 .validMon:
 	ld [wd11e],a
 	call GetMonName
-	hlCoord 3, 4
 	ld de, wcd6d
+	
+.printMon:
+	hlCoord 3, 4
 	call PlaceString
 	ret
 	
@@ -864,13 +872,13 @@ HackNewDebugMenu:
 	ld a,(SFX_02_55 - SFX_Headers_02) / 3
 	call PlaySound
 	call WaitForSoundToFinish
-	jp .menuMainLoop
+	jp .menuInit
 	
 .giveItemFail:
 	ld a,(SFX_02_46 - SFX_Headers_02) / 3
 	call PlaySound
 	call WaitForSoundToFinish
-	jp .menuMainLoop
+	jp .menuInit
 	
 	
 ;"Give Mon" function
@@ -887,7 +895,7 @@ HackNewDebugMenu:
 	ld a,[wHackDebugMenuWhichMon]
 	ld b,a
 	call GivePokemon ;does sound effect, text, nickname etc
-	jp .menuMainLoop
+	jp .menuInit
 
 	
 	;Function pointers for each item
@@ -900,5 +908,8 @@ HackNewDebugMenu:
 .menuText:
 	db   "Give Item:"
 	next "Give Mon:@"
+	
+.questionText:
+	db "?????@"
 	
 ENDC
