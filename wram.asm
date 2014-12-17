@@ -2111,8 +2111,10 @@ ENDC
 
 IF HACK_NEW_DEBUG_MENU == 1
 ;one byte per debug menu option
+wHackDebugMenuItems::
+wHackDebugMenuWhichMap::  ds 1
 wHackDebugMenuWhichItem:: ds 1
-wHackDebugMenuWhichMon:: ds 1
+wHackDebugMenuWhichMon::  ds 1
 ENDC
 
 

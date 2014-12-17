@@ -707,9 +707,13 @@ HackNewDebugMenu:
 	;call PlaySound ; play sound
 	
 	ld a,1
-	ld hl,wHackDebugMenuWhichItem
+	ld hl,wHackDebugMenuItems
 	ld [hli],a
 	ld [hli],a
+	ld [hli],a
+	
+	ld a,[W_CURMAP]
+	ld [wHackDebugMenuWhichMap],a
 	
 	
 	;init menu, or re-init after using an option
@@ -727,7 +731,7 @@ HackNewDebugMenu:
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	
-	ld a, 3 ;# options - 1
+	ld a, 4 ;# options - 1
 	ld [wMaxMenuItem],a
 	
 	call ClearScreen
@@ -782,7 +786,7 @@ HackNewDebugMenu:
 	ld a,[wCurrentMenuItem]
 	ld c,a
 	ld b,0
-	ld hl,wHackDebugMenuWhichItem
+	ld hl,wHackDebugMenuItems
 	add hl,bc
 	ld a,[hl]
 	add e
@@ -801,16 +805,29 @@ HackNewDebugMenu:
 	ld de, .menuText
 	call PlaceString
 	
-	;update item name and ID
+	;draw IDs for items that have them.
+	ld c, 3
 	hlCoord 13, 1
-	ld de, wHackDebugMenuWhichItem
+	ld de, wHackDebugMenuItems
+.redrawNumLoop:
+	push bc
+	push de
 	ld bc, $8103 ;one byte, 3 digits, with leading zeros
 	call PrintNumber
 	
-	;don't attempt to print the names of invalid items
+	ld bc,(SCREEN_WIDTH * 2) - 3
+	add hl,bc
+	pop de
+	inc de
+	pop bc
+	dec c
+	jr nz, .redrawNumLoop
+	
+.drawItemName:
+	;draw item name
 	ld a,[wHackDebugMenuWhichItem]
 	and a
-	jr z, .invalidItem
+	jr z, .invalidItem ;don't attempt to print the names of invalid items
 	cp MAX_ELIXER+1
 	jr c,.validItem
 	cp HM_01
@@ -822,21 +839,15 @@ HackNewDebugMenu:
 .validItem:
 	ld [wd11e],a
 	call GetItemName
-	hlCoord 3, 2
+	hlCoord 3, 4
 	ld de, wcd6d
 	call PlaceString
 	
-	
-	;update mon name and ID
-	hlCoord 13, 3
-	ld de, wHackDebugMenuWhichMon
-	ld bc, $8103 ;one byte, 3 digits, with leading zeros
-	call PrintNumber
-	
-	;don't attempt to print the names of invalid mons
+.drawMonName:
+	;draw mon name
 	ld a,[wHackDebugMenuWhichMon]
 	and a
-	jr z, .invalidMon
+	jr z, .invalidMon ;don't attempt to print the names of invalid mons
 	cp VICTREEBEL+1
 	jr c,.validMon
 	
@@ -850,9 +861,59 @@ HackNewDebugMenu:
 	ld de, wcd6d
 	
 .printMon:
-	hlCoord 3, 4
+	hlCoord 3, 6
 	call PlaceString
 	ret
+	
+	
+	;"Go to map" function
+.funcGotoMap:
+	ld hl,wd732
+	set 2,[hl] ;we used fly (whatever difference it is)
+	set 3,[hl] ;trigger a warp
+	res 4,[hl] ;destination isn't wDungeonWarpDestinationMap
+	res 6,[hl] ;destination isn't wLastBlackoutMap
+	
+	inc hl
+	set 7,[hl] ;used Fly (correct entrance animation)
+	
+	ld hl,wd736
+	set 0,[hl] ;step down from door
+	set 2,[hl] ;standing on warp
+	
+	;I don't know how much of this is necessary or what it all does.
+	;This is still buggy; warping to indoor maps corrupts them.
+	ld hl,wd72e
+	res 4,[hl] ;unsure what this is for.
+	
+	ld a,$26
+	ld [wd730],a
+	
+	;kill the map script so it doesn't try to run from unloaded map
+	ld de,EmptyFunc2
+	ld hl,W_MAPSCRIPTPTR
+	ld a,e
+	ld [hli],a
+	ld [hl],d
+	
+	ld hl,wd790
+	res 7,[hl] ; unset Safari Zone bit
+	xor a
+	ld [W_NUMSAFARIBALLS],a
+	ld [W_SAFARIZONEENTRANCECURSCRIPT],a
+	inc a
+	ld [wEscapedFromBattle],a
+	ld [wcd6a],a ; item used
+	
+	ld a,[W_CURMAP]
+	ld [wLastMap],a
+	
+	ld a,[wHackDebugMenuWhichMap]
+	ld [wDestinationMap],a
+	ld [W_CURMAP],a
+	ld a,1
+	ld [wDestinationWarpID],a
+	jp CloseStartMenu
 	
 	
 	;"Give Item" function
@@ -944,6 +1005,7 @@ HackNewDebugMenu:
 	
 	;Function pointers for each item
 .menuOptionPtrs:
+	dw .funcGotoMap
 	dw .funcGiveItem
 	dw .funcGiveMon
 	dw .funcGiveMoney
@@ -952,12 +1014,22 @@ HackNewDebugMenu:
 	
 	;Item text
 .menuText:
-	db   "Give Item:"
+	db   "Go to map:"
+	next "Give Item:"
 	next "Give Mon:"
 	next "Give Money"
 	next "Open PC@"
 	
 .questionText:
 	db "?????@"
+	
+	
+;other interesting functions/thoughts:
+;PrintPredefTextID
+;Func_74ea (bank 1) - some kind of menu, what is it?
+;IsPlayerStandingOnWarp, IsWarpTileInFrontOfPlayer, IsPlayerStandingOnDoorTileOrWarpTile
+;heal party (HealParty, but not exported)
+;give/edit badges (W_OBTAINEDBADGES)
+;a sound test submenu would be great
 	
 ENDC
