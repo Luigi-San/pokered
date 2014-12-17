@@ -1149,7 +1149,11 @@ StartMenuResetText: ; 71a9 (1:71a9)
 	db "RESET@"
 
 StartMenuExitText: ; 71af (1:71af)
+IF HACK_NEW_DEBUG_MENU == 1
+	db "DEBUG@"
+ELSE
 	db "EXIT@"
+ENDC
 
 StartMenuOptionText: ; 71b4 (1:71b4)
 	db "OPTION@"

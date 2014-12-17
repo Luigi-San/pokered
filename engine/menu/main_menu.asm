@@ -1121,7 +1121,7 @@ HackNewDebugMenu:: ;show the menu
 	db   "Use:"
 	next "Go to map:"
 	next "Give Item:"
-	next "Give Mon:"
+	next "Give ", $E1, $E2, ":"
 	next "Heal Party"
 	next "Give Money"
 	next "Open PC"
