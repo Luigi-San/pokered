@@ -805,6 +805,18 @@ HackNewDebugMenu:
 	ld de, .menuText
 	call PlaceString
 	
+	;draw current map and coords below "goto map"
+	hlCoord 3, 2
+	ld de,W_CURMAP
+	ld bc, $8103 ;one byte, 3 digits, with leading zeros
+	call PrintNumber
+	inc hl
+	ld de,W_XCOORD
+	call PrintNumber
+	inc hl
+	ld de,W_YCOORD
+	call PrintNumber
+	
 	;draw IDs for items that have them.
 	ld c, 3
 	hlCoord 13, 1
