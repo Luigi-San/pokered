@@ -868,6 +868,14 @@ HackNewDebugMenu:
 	
 	;"Go to map" function
 .funcGotoMap:
+	ld a,$FF
+	ld hl,W_TOWNVISITEDFLAG
+	ld [hli],a ;unlock all fly destinations
+	ld [hli],a
+	call ChooseFlyDestination
+	jp CloseStartMenu
+	
+	;selecting a map by ID is clunky and buggy
 	ld hl,wd732
 	set 2,[hl] ;we used fly (whatever difference it is)
 	set 3,[hl] ;trigger a warp
@@ -1033,8 +1041,6 @@ HackNewDebugMenu:
 	
 	
 ;other interesting functions/thoughts:
-;PrintPredefTextID
-;heal party (HealParty, but not exported)
 ;give/edit badges (W_OBTAINEDBADGES)
 ;a sound test submenu would be great
 	
