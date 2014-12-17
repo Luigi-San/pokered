@@ -3081,6 +3081,7 @@ HackDrawBattleMoveInfo:
 	
 	;temporary patch to give us more moves to test with
 	;and boost levels to test HUD
+IF 1 == 0
 	ld a,THUNDER_WAVE
 	ld hl,wBattleMonMoves+2
 	ld [hli],a
@@ -3092,6 +3093,7 @@ HackDrawBattleMoveInfo:
 	ld a,100
 	ld [wBattleMonLevel],a
 	ld [wEnemyMonLevel],a
+ENDC
 	
 	;print % after accuracy
 	hlCoord 8, 11

@@ -28,6 +28,7 @@ HACK_LOW_HEALTH_ALARM_COUNT EQU 3
 ; * Display power and accuracy of selected move.
 ; * Display PP of all moves.
 ; * Display "caught" indicator next to opponent
+; * Display both level and status on HUD
 ; Planned enhancements:
 ; * EXP bars
 ; * Display a move's category (physical/special/status)
