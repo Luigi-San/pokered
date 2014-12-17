@@ -642,3 +642,15 @@ IndexToPokedex: ; 41010 (10:5010)
 	ret
 
 INCLUDE "data/pokedex_order.asm"
+
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+HackPokedexIsMonOwned::
+	;check if we've caught a particular Pokemon.
+	;expects pokemon index# at wd11e.
+	;converts that to a Pokedex# and returns whether mon is
+	;caught in Z flag. (flag set = mon caught)
+	call IndexToPokedex
+	ld hl, wPokedexOwned
+	jp IsPokemonBitSet
+
+ENDC

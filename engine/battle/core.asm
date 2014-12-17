@@ -1962,6 +1962,27 @@ DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
 	ld bc, $40c
 	call ClearScreenArea
 	callab PlaceEnemyHUDTiles
+	
+IF HACK_ENHANCE_BATTLE_SCREEN == 1
+	ld hl,wd11e
+	ld a,[hl]
+	push af ;preserve just in case
+	ld a,[wEnemyMon]
+	ld [hl],a
+	push hl
+	callab HackPokedexIsMonOwned ;added by hack
+	jr z,.EnemyMonNotCaught
+	
+	;draw caught icon
+	hlCoord 1,1
+	ld [hl],$E9 ;unused Japanese letter tile, replaced with ball icon by hack
+	
+.EnemyMonNotCaught:
+	pop hl
+	pop af
+	ld [hl],a
+ENDC
+	
 	ld de, wEnemyMonNick
 	hlCoord 1, 0
 	call CenterMonName
