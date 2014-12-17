@@ -890,6 +890,11 @@ HackNewDebugMenu:
 	;give the mon
 	cp $FF
 	jp z, .menuMainLoop ;cancelled
+	
+	ld a,[hJoyHeld]
+	bit 2,a ;select held?
+	jr nz,.fightMon
+	
 	ld a,[wcf96] ;selected quantity
 	ld c,a
 	ld a,[wHackDebugMenuWhichMon]
@@ -897,6 +902,13 @@ HackNewDebugMenu:
 	call GivePokemon ;does sound effect, text, nickname etc
 	jp .menuInit
 
+
+.fightMon:
+	ld a,[wcf96] ;selected quantity
+	ld [W_CURENEMYLVL], a
+	ld a,[wHackDebugMenuWhichMon]
+	ld [W_CUROPPONENT], a
+	jp CloseStartMenu
 	
 	;Function pointers for each item
 .menuOptionPtrs:
