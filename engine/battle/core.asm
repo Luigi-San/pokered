@@ -3048,7 +3048,7 @@ ENDC
 
 DisabledText: ; 3d555 (f:5555)
 IF HACK_ENHANCE_BATTLE_SCREEN == 1
-	db "Disabled" ;no ! to fit box
+	db "Disabled@" ;no ! to fit box
 ELSE
 	IF DEF(_YELLOW)
 		db "Disabled!@"
@@ -3082,7 +3082,7 @@ HackDrawBattleMoveInfo:
 	;temporary patch to give us more moves to test with
 	;and boost levels to test HUD
 IF 1 == 0
-	ld a,THUNDER_WAVE
+	ld a,THUNDER_WAVE ;one of the longest-named moves
 	ld hl,wBattleMonMoves+2
 	ld [hli],a
 	ld [hl],REST
