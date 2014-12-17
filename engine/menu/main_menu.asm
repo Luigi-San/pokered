@@ -721,16 +721,20 @@ HackNewDebugMenu:
 	inc a
 	ld [wTopMenuItemX],a
 	ld [wTopMenuItemY],a
+	ld [wMenuWrappingEnabled],a
 	
 	ld a,$FF
 	ld [wMenuWatchedKeys],a ;handle all buttons
 	
-	ld a,1 ;# options - 1
+	ld a, 2 ;# options - 1
 	ld [wMaxMenuItem],a
+	
+	call ClearScreen
 	
 	;menu main loop while open
 .menuMainLoop:
 	call .redraw
+	call UpdateSprites
 	call HandleMenuInput
 	push af
 	call WaitForSoundToFinish
@@ -786,11 +790,9 @@ HackNewDebugMenu:
 
 	;redraw the menu
 .redraw:
-	call LoadScreenTilesFromBuffer2 ;refresh screen
-
 	;draw border
 	hlCoord 0, 0
-	ld bc, $0412 ; 4 x 18
+	ld bc, $1012 ; 20 x 18
 	call TextBoxBorder
 	
 	;draw menu text
@@ -883,7 +885,7 @@ HackNewDebugMenu:
 	jp .menuInit
 	
 	
-;"Give Mon" function
+	;"Give Mon" function
 .funcGiveMon:
 	ld a,100
 	ld [wcf97],a ;max quantity (level)
@@ -914,16 +916,30 @@ HackNewDebugMenu:
 	ld [W_CUROPPONENT], a
 	jp CloseStartMenu
 	
+
+	;"Open PC" function
+.funcOpenPC:
+	call FuncTX_PokemonCenterPC
+	jp CloseStartMenu
+	;I don't know why the menu doesn't work after opening the PC.
+	;it seems to have to do with wFlags_0xcd60.
+	;if I save that and restore it after calling the PC,
+	;the game will actually crash, which makes no goddamn sense.
+	;even with this, the start menu doesn't actually close.
+	
+	
 	;Function pointers for each item
 .menuOptionPtrs:
 	dw .funcGiveItem
 	dw .funcGiveMon
-	
+	dw .funcOpenPC
+
 	
 	;Item text
 .menuText:
 	db   "Give Item:"
-	next "Give Mon:@"
+	next "Give Mon:"
+	next "Open PC@"
 	
 .questionText:
 	db "?????@"
