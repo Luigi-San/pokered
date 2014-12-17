@@ -856,6 +856,8 @@ HackNewDebugMenu:
 .funcGiveItem:
 	ld a,99
 	ld [wcf97],a ;max quantity
+	ld a,ITEMLISTMENU
+	ld [wListMenuID],a
 	call DisplayChooseQuantityMenu
 	
 	;give the item
@@ -885,6 +887,8 @@ HackNewDebugMenu:
 .funcGiveMon:
 	ld a,100
 	ld [wcf97],a ;max quantity (level)
+	ld a,ITEMLISTMENU
+	ld [wListMenuID],a
 	call DisplayChooseQuantityMenu
 	
 	;give the mon
