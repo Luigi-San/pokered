@@ -2449,6 +2449,24 @@ PartyMenuOrRockOrRun:
 	jp UseBagItem
 .partyMenuWasSelected
 	call LoadScreenTilesFromBuffer1
+	
+IF HACK_BATTLE_PARTY_STATS_MENU == 1
+	;the hack basically copies this code into a reusable function,
+	;so call it here instead of duplicating it to save ROM space
+	call HackShowChooseMonMenu
+	jr nc,.notCancelled
+	
+	call ClearSprites
+	call GBPalWhiteOut
+	call LoadHudTilePatterns
+	call LoadScreenTilesFromBuffer2
+	call GoPAL_SET_CF1C
+	call GBPalNormal
+	jp DisplayBattleMenu
+	
+.notCancelled:
+ELSE
+	
 	xor a
 	ld [wd07d], a
 	ld [wMenuItemToSwap], a
@@ -2543,6 +2561,8 @@ PartyMenuOrRockOrRun:
 .notAlreadyOut
 	call HasMonFainted
 	jp z, .partyMonDeselected ; can't switch to fainted mon
+ENDC
+
 	ld a, $1
 	ld [wcd6a], a
 	call GBPalWhiteOut
