@@ -1405,6 +1405,7 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	sub 4
 	ld [wWhichPokemon],a
 	jr .next3
+	
 .next
 	ld b,$FF
 .next2
@@ -1425,6 +1426,7 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	ld a,[hl]
 	or c
 	jr z,.next2
+	
 .next3
 	ld a,[wWhichPokemon]
 	ld hl,wEnemyMon1Level
@@ -1461,41 +1463,53 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	ld a,[W_OPTIONS]
 	bit 6,a
 	jr nz,.next4
+	
+	;show "trainer is about to use pkmn. will you switch?"
 	ld hl, TrainerAboutToUseText
 	call PrintText
 	hlCoord 0, 7
 	ld bc,$0801
 	ld a,$14
 	ld [wd125],a
-	call DisplayTextBoxID
+	call DisplayTextBoxID ;show yes/no prompt?
 	ld a,[wCurrentMenuItem]
 	and a
-	jr nz,.next4
+	jr nz,.next4 ;not switching
+	
+	;ask player to choose a mon
 	ld a,2
 	ld [wd07d],a
 	call DisplayPartyMenu
+
 .next9
 	ld a,1
 	ld [wCurrentMenuItem],a
-	jr c,.next7
-	ld hl,wPlayerMonNumber
+	jr c,.next7 ;cancelled, not switching
+	
+	ld hl,wPlayerMonNumber ;is this mon already out?
 	ld a,[wWhichPokemon]
 	cp [hl]
 	jr nz,.next6
+	
+	;"<mon> is already out!"
 	ld hl,AlreadyOutText
 	call PrintText
+	
 .next8
 	call GoBackToPartyMenu
 	jr .next9
+	
 .next6
-	call HasMonFainted
+	call HasMonFainted ;is this mon fainted?
 	jr z,.next8
 	xor a
 	ld [wCurrentMenuItem],a
+	
 .next7
 	call GBPalWhiteOut
 	call LoadHudTilePatterns
 	call LoadScreenTilesFromBuffer1
+	
 .next4
 	call ClearSprites
 	ld hl,wTileMap
