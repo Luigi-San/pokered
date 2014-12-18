@@ -44,6 +44,8 @@ HACK_ENHANCE_BATTLE_SCREEN EQU 1
 
 
 ;show the "stats/switch/cancel" menu when switching mons in battle.
+;normally it doesn't show when choosing a mon after yours or an opponent's
+;has fainted, which is annoying because you can't check stats.
 HACK_BATTLE_PARTY_STATS_MENU EQU 1
 
 

@@ -9,6 +9,9 @@ Current enhancements available:
 * Disable low health alarm, or make it beep only a few times and then stop
 * Improvements to battle screen (more info about selected move, show "caught"
   indicator, etc)
+* Allow checking your Pokémon's stats from the "choose a Pokémon" menu in battle
+  at all times (normally this option isn't shown if choosing a Pokémon after
+  yours or an opponent's has fainted)
 * Debugging functions (debug menu, walk through walls, no random battles)
 * Skip intro
 
