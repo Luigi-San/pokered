@@ -1163,8 +1163,7 @@ UseNextMonText: ; 3c7d3 (f:47d3)
 ChooseNextMon: ; 3c7d8 (f:47d8)
 IF HACK_BATTLE_PARTY_STATS_MENU == 1
 	call HackShowChooseMonMenu
-	cp $ff
-	jr z,ChooseNextMon ;must choose a mon
+	jr c,ChooseNextMon ;must choose a mon
 	call HasMonFainted
 	jr z,ChooseNextMon ;must not choose a fainted mon
 	
@@ -1477,9 +1476,13 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	jr nz,.next4 ;not switching
 	
 	;ask player to choose a mon
+IF HACK_BATTLE_PARTY_STATS_MENU == 1
+	call HackShowChooseMonMenu
+ELSE
 	ld a,2
 	ld [wd07d],a
 	call DisplayPartyMenu
+ENDC
 
 .next9
 	ld a,1
@@ -8926,7 +8929,7 @@ Func_3fbbc: ; 3fbbc (f:7bbc)
 
 IF HACK_BATTLE_PARTY_STATS_MENU == 1
 	;hack function to show the party menu, with stats/switch/cancel submenu,
-	;and return the chosen mon index in A (or $FF if cancelled).
+	;and return the chosen mon index in A; sets carry flag if cancelled
 HackShowChooseMonMenu::
 	xor a
 	ld [wd07d], a
@@ -8934,10 +8937,9 @@ HackShowChooseMonMenu::
 	call DisplayPartyMenu
 	
 .checkIfPartyMonWasSelected:
-	jp nc, .monSelected
+	jr nc, .monSelected
 	
 	;menu cancelled
-	ld a,$FF
 	ret
 	
 .partyMonDeselected
@@ -9031,5 +9033,7 @@ HackShowChooseMonMenu::
 	call HasMonFainted
 	jp z, .partyMonDeselected ; can't switch to fainted mon
 	ld a, [wWhichPokemon]
+	scf ;ensure carry flag is zero
+	ccf ;ccf is complement, not clear
 	ret
 ENDC
