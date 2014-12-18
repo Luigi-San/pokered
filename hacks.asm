@@ -11,7 +11,7 @@
 ; 1: fast walking (always run).
 ; 2: normal walking; hold B to run (anywhere)
 ; 3: normal walking; hold B to run (only outdoors/on maps that allow biking)
-HACK_RUNNING_SHOES EQU 1
+HACK_RUNNING_SHOES EQU 0
 
 
 
@@ -26,7 +26,7 @@ HACK_SPEED_UP_OVERWORLD EQU 0
 ; 0: leave it alone
 ; 1: disable it completely
 ; 2: beep a few times then stop
-HACK_LOW_HEALTH_ALARM EQU 2
+HACK_LOW_HEALTH_ALARM EQU 0
 
 ;how many times to beep, with mode 2 (1 to 127)
 HACK_LOW_HEALTH_ALARM_COUNT EQU 3
@@ -40,7 +40,7 @@ HACK_LOW_HEALTH_ALARM_COUNT EQU 3
 ; Planned enhancements:
 ; * EXP bars
 ; * Display a move's category (physical/special/status)
-HACK_ENHANCE_BATTLE_SCREEN EQU 1
+HACK_ENHANCE_BATTLE_SCREEN EQU 0
 
 
 ; Enable the original debug mode (bit 1 of wd732)
@@ -51,16 +51,16 @@ HACK_ENHANCE_BATTLE_SCREEN EQU 1
 ; note that this hack might interfere with link battles, because those turn
 ; the debug mode off for some reason, but this hack forces it back on.
 ; probably this has to do with them re-using the "destination map" variable.
-HACK_ENABLE_DEBUG_MODE EQU 1
+HACK_ENABLE_DEBUG_MODE EQU 0
 
 
 ;hold B to walk through walls.
-HACK_WALK_THROUGH_WALLS EQU 1
+HACK_WALK_THROUGH_WALLS EQU 0
 
 
 ;enable a new debug menu (not in the original program)
-HACK_NEW_DEBUG_MENU EQU 1
+HACK_NEW_DEBUG_MENU EQU 0
 
 
 ;skip the intro and boot directly to the title screen
-HACK_SKIP_INTRO EQU 1
+HACK_SKIP_INTRO EQU 0

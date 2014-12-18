@@ -38,9 +38,8 @@ rLCDC_DEFAULT EQU %11100011
 	ld a, rLCDC_ENABLE_MASK
 	ld [rLCDC], a
 	call DisableLCD
-
+	
 	ld sp, wStack
-
 	ld hl, $c000 ; start of WRAM
 	ld bc, $2000 ; size of WRAM
 .loop

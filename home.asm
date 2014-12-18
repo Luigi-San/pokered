@@ -107,6 +107,9 @@ Start::
 	xor a
 	jr .ok
 .gbc
+	;regardless of the check, the game stores zero to this flag.
+	;anyway, the Init function clears all memory including wGBC,
+	;so this check is doubly redundant.
 	ld a, 0
 .ok
 	ld [wGBC], a
