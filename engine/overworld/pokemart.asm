@@ -135,6 +135,9 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
 	ld [wListMenuID],a
 	call DisplayListMenuID
 	jr c,.returnToMainPokemartMenu ; if the player closed the menu
+IF HACK_SHOW_OWNED_ITEM_COUNT == 1
+	call HackShowItemCount
+ENDC
 	ld a,$63
 	ld [wcf97],a
 	xor a
@@ -252,3 +255,89 @@ PokemartThankYouText: ; 6e39 (1:6e39)
 PokemartAnythingElseText: ; 6e3e (1:6e3e)
 	TX_FAR _PokemartAnythingElseText
 	db "@"
+	
+IF HACK_SHOW_OWNED_ITEM_COUNT == 1
+HackShowItemCount:
+	;clear the textbox area
+	hlCoord 1,14
+	ld bc, $0310 ;16x4
+	call ClearScreenArea
+	
+	;print the label
+	hlCoord 1,14
+	ld de, HackItemsInBagText
+	call PlaceString
+	
+	;fetch and print the item count
+	ld a,[wcf91] ; item ID
+	call HackGetNumItemsInBag
+	hlCoord 9,14
+	call .printNum
+	
+	ld a,[wcf91] ; item ID
+	call HackGetNumItemsInPC
+	hlCoord 9,16
+	;fall through
+	
+.printNum:
+	push hl ;push hl once to make space on the stack for our number
+	push hl ;push a second time to actually save it
+	ld hl,sp+2 ;get the pointer to that space
+	ld a,b
+	ld [hli],a ;overwrite it with the item count
+	ld a,c
+	ld [hld],a
+	ld d,h     ;copy hl into de
+	ld e,l
+	pop hl     ;restore hl (destination address)
+	ld bc,$4205 ;2 bytes, 5 digits, left align
+	call PrintNumber
+	pop hl ;pop the temp space to balance the stack.
+	ret
+	
+HackGetNumItemsInPC::
+	ld hl,wBoxItems
+	jr HackGetNumItems_
+
+HackGetNumItemsInBag::
+	;given an item ID in A, count how many of them are in the bag and
+	;return that amount in BC.
+	ld hl,wBagItems
+	
+HackGetNumItems_:
+	ld bc, 0
+	ld d,a  ;d = item ID
+
+.loop:
+	ld a,[hli] ;a = this item ID
+	cp $FF     ;no more items?
+	jr z, .done
+	
+	cp d
+	jr nz, .next
+	
+	;add this quantity to the total
+	ld a,[hl]  ;get quantity
+	push hl
+	
+	push bc
+	pop hl ;copy bc into hl
+	ld b,0
+	ld c,a
+	add hl,bc
+	push hl
+	pop bc ;copy hl into bc
+	
+	pop hl ;restore hl (item ptr)
+	
+.next:
+	inc hl ;next item ID
+	jr .loop
+	
+.done:
+	ret
+	
+HackItemsInBagText:
+	db   "In bag:"
+	next "In PC:@"
+ENDC

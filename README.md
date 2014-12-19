@@ -12,6 +12,9 @@ Current enhancements available:
 * Allow checking your Pokémon's stats from the "choose a Pokémon" menu in battle
   at all times (normally this option isn't shown if choosing a Pokémon after
   yours or an opponent's has fainted)
+* Press left/right to adjust quantity by 10 when buying, selling or tossing
+  items
+* When buying items, show how many you already have
 * Debugging functions (debug menu, walk through walls, no random battles)
 * Skip intro
 

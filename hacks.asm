@@ -54,6 +54,10 @@ HACK_BATTLE_PARTY_STATS_MENU EQU 1
 HACK_ADJUST_ITEM_QTY_BY_10 EQU 1
 
 
+;when buying items, show how many you already have
+HACK_SHOW_OWNED_ITEM_COUNT EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)

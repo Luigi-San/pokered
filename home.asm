@@ -1618,10 +1618,10 @@ IF HACK_ADJUST_ITEM_QTY_BY_10 == 1
 	jr z, .sub10underflow
 	jr .adj10ok
 	
-.sub10underflow:
+.sub10underflow: ;if <= 0, set to 1
 	ld a,1
 	
-.adj10ok:
+.adj10ok: ;adjusted OK, store the new quantity
 	ld [wcf96],a
 	jr .handleNewQuantity
 	
