@@ -49,6 +49,11 @@ HACK_ENHANCE_BATTLE_SCREEN EQU 1
 HACK_BATTLE_PARTY_STATS_MENU EQU 1
 
 
+;allow to press left/right to adjust quantity by 10 when
+;buying/selling/tossing an item
+HACK_ADJUST_ITEM_QTY_BY_10 EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)

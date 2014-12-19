@@ -32,6 +32,12 @@ HackNewDebugMenu:: ;show the menu
 	;init menu, or re-init after using an option
 .menuInit:
 	call WaitForSoundToFinish
+	
+	;ld hl, $fff6
+	;set 1, [hl] ;set cursor to move one row per item.
+	ld hl, wd730
+	set 6,[hl] ;display text with no delay
+	
 	xor a
 	ld [wLastMenuItem],a
 	
@@ -58,6 +64,9 @@ HackNewDebugMenu:: ;show the menu
 	push af
 	call WaitForSoundToFinish
 	
+	ld a,1
+	ld [wMenuWrappingEnabled],a
+	
 	ld a,[wCurrentMenuItem]
 	ld [wHackDebugMenuCursor],a ;save cursor
 	pop af
@@ -66,7 +75,7 @@ HackNewDebugMenu:: ;show the menu
 	jr nz, .activate
 	
 	bit 1,a ;B pressed?
-	jp nz, CloseStartMenu
+	jp nz, .closeMenu
 	
 	bit 4,a ;Right pressed?
 	jr nz, .increment
@@ -224,7 +233,7 @@ HackNewDebugMenu:: ;show the menu
 	ld [hli],a ;unlock all fly destinations
 	ld [hli],a
 	call ChooseFlyDestination
-	jp CloseStartMenu
+	jp .closeMenu
 	
 	;selecting a map by ID is clunky and buggy
 	ld hl,wd732
@@ -272,7 +281,7 @@ HackNewDebugMenu:: ;show the menu
 	ld [W_CURMAP],a
 	ld a,1
 	ld [wDestinationWarpID],a
-	jp CloseStartMenu
+	jp .closeMenu
 	
 	
 	;"Give Item" function
@@ -333,7 +342,7 @@ HackNewDebugMenu:: ;show the menu
 	ld [W_CURENEMYLVL], a
 	ld a,[wHackDebugMenuWhichMon]
 	ld [W_CUROPPONENT], a
-	jp CloseStartMenu
+	jp .closeMenu
 	
 	
 .funcUseThing:
@@ -389,7 +398,7 @@ HackNewDebugMenu:: ;show the menu
 	;"Open PC" function
 .funcOpenPC:
 	call FuncTX_PokemonCenterPC
-	jp CloseStartMenu
+	jp .closeMenu
 	;I don't know why the menu doesn't work after opening the PC.
 	;it seems to have to do with wFlags_0xcd60.
 	;if I save that and restore it after calling the PC,
@@ -401,6 +410,12 @@ HackNewDebugMenu:: ;show the menu
 	ld a,[wHackDebugMenuWhichSound]
 	call PlaySound
 	jp .menuInit
+	
+	
+.closeMenu:
+	ld hl, wd730
+	res 6,[hl] ;turn text delay back on
+	jp CloseStartMenu
 	
 	
 	;Function pointers for each item

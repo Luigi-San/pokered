@@ -1600,7 +1600,44 @@ DisplayChooseQuantityMenu:: ; 2d57 (0:2d57)
 	jr nz,.incrementQuantity
 	bit 7,a ; was Down pressed?
 	jr nz,.decrementQuantity
+	
+IF HACK_ADJUST_ITEM_QTY_BY_10 == 1
+	bit 5,a ; was Left pressed?
+	jr nz, .subtract10
+	bit 4,a ; was Right pressed?
+	jr nz, .add10
+ENDC
+
 	jr .waitForKeyPressLoop
+	
+IF HACK_ADJUST_ITEM_QTY_BY_10 == 1
+.subtract10:
+	ld a,[wcf96] ;current quantity
+	sub 10
+	jr c, .sub10underflow
+	jr z, .sub10underflow
+	jr .adj10ok
+	
+.sub10underflow:
+	ld a,1
+	
+.adj10ok:
+	ld [wcf96],a
+	jr .handleNewQuantity
+	
+.add10:
+	ld a,[wcf97] ; max quantity
+	ld b,a
+	ld a,[wcf96] ;current quantity
+	add 10
+	cp b
+	jr c, .adj10ok
+	ld a,b
+	jr .adj10ok
+	
+ENDC
+	
+	
 .incrementQuantity
 	ld a,[wcf97] ; max quantity
 	inc a
