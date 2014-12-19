@@ -16,11 +16,16 @@ Current enhancements available:
   items
 * When buying items, show how many you already have
 * Debugging functions (debug menu, walk through walls, no random battles)
-* Skip intro
+* Skip intro (boot directly to title screen)
 
 Planned enhancements:
 
 * Remove/reduce text delay
+* Use HMs directly from overworld (like in later games)
+* Register items to Select button
+* Notify when PC box is (nearly) full, and/or allow to change it from anywhere
+* Show descriptions of items and moves
+* Ability to sort items automatically
 * Various menu improvements and bug fixes
 * Who knows?
 
