@@ -58,6 +58,10 @@ HACK_ADJUST_ITEM_QTY_BY_10 EQU 1
 HACK_SHOW_OWNED_ITEM_COUNT EQU 1
 
 
+;allow to set the text speed anywhere from 0 to 7
+HACK_FULL_TEXT_SPEED_OPTION EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)

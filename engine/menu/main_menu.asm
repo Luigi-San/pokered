@@ -546,6 +546,25 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
 	xor a,$0b ; toggle between 1 and 10
 	ld [wTrainerFacingDirection],a
 	jp .eraseOldMenuCursor
+
+IF HACK_FULL_TEXT_SPEED_OPTION == 1
+.pressedLeftInTextSpeed
+	ld a,[wWhichTrade]
+	dec a
+	dec a
+	jr .updateTextSpeedCursor
+
+.pressedRightInTextSpeed
+	ld a,[wWhichTrade]
+	inc a
+	inc a
+	
+.updateTextSpeedCursor
+	and $0F
+	ld [wWhichTrade],a
+	jp .eraseOldMenuCursor
+ELSE
+
 .pressedLeftInTextSpeed
 	ld a,[wWhichTrade] ; text speed cursor X coordinate
 	cp a,1
@@ -570,10 +589,15 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
 .updateTextSpeedXCoord
 	ld [wWhichTrade],a ; text speed cursor X coordinate
 	jp .eraseOldMenuCursor
+ENDC
 
 TextSpeedOptionText: ; 5fc0 (1:5fc0)
 	db   "TEXT SPEED"
+IF HACK_FULL_TEXT_SPEED_OPTION == 1
+	next " 1 2 3 4 5 6 7 8@"
+ELSE
 	next " FAST  MEDIUM SLOW@"
+ENDC
 
 BattleAnimationOptionText: ; 5fde (1:5fde)
 	db   "BATTLE ANIMATION"
@@ -668,10 +692,22 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
 ; 00: X coordinate of menu cursor
 ; 01: delay after printing a letter (in frames)
 TextSpeedOptionData: ; 6096 (1:6096)
+IF HACK_FULL_TEXT_SPEED_OPTION == 1
+	db  1, 7
+	db  3, 6
+	db  5, 5
+	db  7, 4
+	db  9, 3
+	db 11, 2
+	db 13, 1
+	db 15, 0
+	db 7 ; default X coordinate (speed 4)
+ELSE
 	db 14,5 ; Slow
 	db  7,3 ; Medium
 	db  1,1 ; Fast
 	db 7 ; default X coordinate (Medium)
+ENDC
 	db $ff ; terminator
 
 Func_609e: ; 609e (1:609e)

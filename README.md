@@ -6,6 +6,7 @@ enhancement patches.
 Current enhancements available:
 
 * Increase walking speed (always, or only while holding B)
+* Allow more precise control over text delay (0 to 7 frames per letter)
 * Disable low health alarm, or make it beep only a few times and then stop
 * Improvements to battle screen (more info about selected move, show "caught"
   indicator, etc)
@@ -20,7 +21,6 @@ Current enhancements available:
 
 Planned enhancements:
 
-* Remove/reduce text delay
 * Use HMs directly from overworld (like in later games)
 * Register items to Select button
 * Notify when PC box is (nearly) full, and/or allow to change it from anywhere
