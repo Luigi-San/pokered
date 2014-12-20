@@ -1,5 +1,4 @@
 ;hack functions to use HM moves directly from the overworld.
-;TODO: Strength
 
 SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM where it fits.
 HackCheckFacingTile::
@@ -197,7 +196,17 @@ checkWhoHasMove:
 	;copy mon's name to wcd6d
 	ld a,e
 	ld [wWhichPokemon],a
+	push af
 	call GetPartyMonName2
+	
+	;get the mon species (needed for playing cry for Strength)
+	pop af
+	ld hl,wPartySpecies
+	ld b,0
+	ld c,a
+	add hl,bc
+	ld a,[hl]
+	ld [wcf91],a
 
 .hasMove:
 	scf
