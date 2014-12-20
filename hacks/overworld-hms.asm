@@ -37,7 +37,7 @@ HackCheckFacingTile::
 .unknownTile:
 	;debug: show the tile ID
 	ld hl,hackUnknownTileText
-	jp hackDisplayText
+	;jp hackDisplayText
 	ret
 	
 	
@@ -171,7 +171,8 @@ hackForceNPCsStandStill:
 ;check which mon, if any, knows a move.
 ;move ID in B
 ;returns carry set if someone has it.
-;also copies their name to wcd6d.
+;also copies their name to wcd6d, species to wcf91,
+;and party position to wWhichPokemon.
 checkWhoHasMove:
 	ld a,[wPartyCount]
 	and a
@@ -189,7 +190,7 @@ checkWhoHasMove:
 	inc e
 	dec d
 	jr nz,.nextMon
-	ccf
+	and a ;clear carry
 	ret
 
 .foundMon:
@@ -220,7 +221,7 @@ checkWhoHasMove:
 	jr z,.hasMove
 	dec c
 	jr nz,.nextMove
-	ccf
+	and a ;clear carry
 	ret
 	
 	

@@ -6,6 +6,7 @@ enhancement patches.
 Current enhancements available:
 
 * Increase walking speed (always, or only while holding B)
+* Use Cut/Surf/Strength directly from the overworld
 * Allow more precise control over text delay (0 to 7 frames per letter)
 * Disable low health alarm, or make it beep only a few times and then stop
 * Improvements to battle screen (more info about selected move, show "caught"
