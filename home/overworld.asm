@@ -2475,19 +2475,32 @@ HackCheckFacingTile::
 	ld a,[wTileInFrontOfPlayer]
 	ld b,a
 	
-	;check if this is a water tile
-	ld hl,.waterTiles
-.checkWaterLoop:
+	ld hl, hackTileFunctions
+.nextTile:
 	ld a,[hli]
 	cp $FF
-	jr z,.notWater
+	jr z, .unknownTile
 	cp b
-	jr nz, .checkWaterLoop
+	jr nz, .nextTile
 	
-	;this is a water tile.
+	;get the function pointer and call it.
+	ld b,b
+	ld a,[hli]
+	ld h,[hl]
+	ld l,a
+	jp hl
+	
+.unknownTile:
+	;debug: show the tile ID
+	ld hl,hackUnknownTileText
+	jp hackDisplayText
+	ret
+	
+	
+hackInteractWaterTile:
 	;display the "water is calm" message.
 	call hackOpenTextBox
-	ld hl,.waterText
+	ld hl,hackWaterCalmText
 	call PrintText
 	call WaitForTextScrollButtonPress
 	
@@ -2506,72 +2519,63 @@ HackCheckFacingTile::
 	call UseItem
 	jp hackCloseTextBox
 	
-.notWater:
-	ld a,1
-	jp .displayText
-	ret
-
-	;display one of the messages from debugTextPtrs
-	;A = which message
-.displayText:
-	ld hl,wcf11
+	
+hackDisplayText:
+	;display a textbox, wait for user to close it, and remove it.
+	push hl
+	call hackOpenTextBox
+	pop hl
+	call PrintText
+	call WaitForTextScrollButtonPress
+	jp hackCloseTextBox
+	
+	
+hackOpenTextBox:
+	xor a
+	ld [wListMenuID],a
+	call hackForceNPCsStandStill
+	call UpdateSprites
+	ld hl,wcfc4 ;have the map sprites reloaded after we're done.
 	set 0,[hl]
 	
-	;store the text ID
-	ld [$ff8c],a
+	hlCoord 0, 12
+	ld bc,$0412
+	call TextBoxBorder
 	
-	;save the current map text pointer.
-	;this seems to be the only way to actually display a popup message
-	;with an aribtrary text pointer.
-	ld hl,W_MAPTEXTPTR
-	ld a,[hli]
-	ld b,a
-	ld a,[hld]
-	ld c,a
-	push bc
+	ld b,$9c ; window background address
+	call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
 	
-	;replace the current text pointer with our own.
-	ld de,.textPtrs
-	ld a,e
-	ld [hli],a
-	ld [hl],d
-	push hl
-	
-	;display that text.
-	call DisplayTextID
-	
-	;restore old map text pointer.
-	pop hl
-	pop bc
-	ld a,c
-	ld [hld],a
-	ld [hl],b
+	call LoadFontTilePatterns
+	xor a
+	ld [hWY],a ; put the window on the screen
+	inc a
+	ld [H_AUTOBGTRANSFERENABLED],a ; enable continuous WRAM to VRAM transfer each V-blank
 	ret
 	
+hackCloseTextBox:
+	xor a
+	ld [H_AUTOBGTRANSFERENABLED],a
+	jp CloseTextDisplay
 	
-.waterTiles:
-	db $14 ;water tile
-	db $32 ;either the left tile of the S.S. Anne boarding platform or the tile
-	       ;on eastern coastlines (depending on the current tileset)
-	db $48 ;tile on right on coast lines in Safari Zone
-	db $FF ;end of list
 	
-.textPtrs:
-	;msg 0 is nonexistent, since it always shows the start menu.
-	dw .debugTextWhichTile ;msg 1
-	dw .waterText
-
-	;debug message, shows which tile ID you're standing at
-.debugTextWhichTile:
-	db $0 ;print inline text
-		db "Tile @"
-		TX_NUM wTileInFrontOfPlayer, 1, 3
-		db "@" ;end string
-	db "@" ;end text
-	
-.waterText:
-	db $0, "The water is calm.@"
-	db "@" ;end text
+hackForceNPCsStandStill:
+	;set all NPCs to standing animation so that we can
+	;overwrite the walk frames with text
+	ld hl,wSpriteStateData1 + 2
+	ld de,$0010
+	ld c,e
+.spriteStandStillLoop
+	ld a,[hl]
+	cp a,$ff ; is the sprite visible?
+	jr z,.nextSprite
+; if it is visible
+	and a,$fc
+	ld [hl],a
+.nextSprite
+	add hl,de
+	dec c
+	jr nz,.spriteStandStillLoop
+	ret
 	
 	
 ;check which mon, if any, knows a move.
@@ -2594,7 +2598,8 @@ checkWhoHasMove:
 	jr nz,.nextMon
 	ccf
 	ret
-	
+
+.hasMove:
 .foundMon:
 	scf
 	ret
@@ -2610,57 +2615,25 @@ checkWhoHasMove:
 	ccf
 	ret
 	
-.hasMove:
-	scf
-	ret
 	
+;map of tile ID => which function to use when pressing A at it.
+hackTileFunctions:
+	dbw $14, hackInteractWaterTile
+	dbw $32, hackInteractWaterTile
+	dbw $48, hackInteractWaterTile
+	db $FF ;end of list.
 	
-hackOpenTextBox:
-	xor a
-	ld [wListMenuID],a
-	call hackForceNPCsStandStill
-	call UpdateSprites
-	ld hl,wcfc4 ;have the map sprites reloaded after we're done.
-	set 0,[hl]
+	;displays tile ID if it's not in the above list.
+hackUnknownTileText:
+	db $0 ;print inline text
+		db "Tile @"
+		TX_NUM wTileInFrontOfPlayer, 1, 3
+		db "@" ;end string
+	db "@" ;end text
 	
-	hlCoord 0, 12
-	ld bc,$0412
-	call TextBoxBorder
-	
-	ld b,$9c ; window background address
-	call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
-	
-	xor a
-	ld [hWY],a ; put the window on the screen
-	call LoadFontTilePatterns
-	ld a,$01
-	ld [H_AUTOBGTRANSFERENABLED],a ; enable continuous WRAM to VRAM transfer each V-blank
-	
-	ret
-	
-hackCloseTextBox:
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED],a
-	jp CloseTextDisplay
-	
-hackForceNPCsStandStill:
-	;set all NPCs to standing animation so that we can
-	;overwrite the walk frames with text
-	ld hl,wSpriteStateData1 + 2
-	ld de,$0010
-	ld c,e
-.spriteStandStillLoop
-	ld a,[hl]
-	cp a,$ff ; is the sprite visible?
-	jr z,.nextSprite
-; if it is visible
-	and a,$fc
-	ld [hl],a
-.nextSprite
-	add hl,de
-	dec c
-	jr nz,.spriteStandStillLoop
-	ret
+hackWaterCalmText:
+	db $0, "The water is calm.@"
+	db "@" ;end text
 	
 POPS
 ENDC
