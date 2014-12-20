@@ -236,7 +236,7 @@ hackUseStrengthOverworld::
 	call WaitForTextScrollButtonPress
 	
 	ld a,[W_OBTAINEDBADGES]
-	bit 1,a
+	bit 3,a
 	jr z, .done ;player doesn't have badge needed to use Strength.
 	
 	ld b,STRENGTH
