@@ -2616,6 +2616,7 @@ checkWhoHasMove:
 	
 	
 hackOpenTextBox:
+	call hackForceNPCsStandStill
 	xor a
 	ld [wListMenuID],a
 	;call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
@@ -2637,6 +2638,25 @@ hackCloseTextBox:
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED],a
 	jp CloseTextDisplay
-
+	
+hackForceNPCsStandStill:
+	;set all NPCs to standing animation so that we can
+	;overwrite the walk frames with text
+	ld hl,wSpriteStateData1 + 2
+	ld de,$0010
+	ld c,e
+.spriteStandStillLoop
+	ld a,[hl]
+	cp a,$ff ; is the sprite visible?
+	jr z,.nextSprite
+; if it is visible
+	and a,$fc
+	ld [hl],a
+.nextSprite
+	add hl,de
+	dec c
+	jr nz,.spriteStandStillLoop
+	ret
+	
 POPS
 ENDC
