@@ -2506,17 +2506,19 @@ hackInteractWaterTile:
 	
 	ld a,[W_OBTAINEDBADGES]
 	bit 4,a
-	;ret z ;player doesn't have badge needed to surf.
+	;jr z, .done ;player doesn't have badge needed to surf.
 	
 	ld b,SURF
 	call checkWhoHasMove
-	;ret nc ;nobody knows Surf.
+	;jr nc, .done ;nobody knows Surf.
 	
 	;use Surf
 	ld a,SURFBOARD
 	ld [wcf91],a
 	ld [wd152],a
 	call UseItem
+	
+.done:
 	jp hackCloseTextBox
 	
 	
@@ -2581,11 +2583,13 @@ hackForceNPCsStandStill:
 ;check which mon, if any, knows a move.
 ;move ID in B
 ;returns carry set if someone has it.
+;also copies their name to wcd6d.
 checkWhoHasMove:
 	ld a,[wPartyCount]
 	and a
 	ret z
 	ld d,a
+	ld e,0
 	ld hl,wPartyMon1Moves
 .nextMon:
 	call .checkMonHasMove
@@ -2594,13 +2598,19 @@ checkWhoHasMove:
 	ld bc,wPartyMon2 - wPartyMon1 ;size of PartyMon
 	add hl,bc
 	pop bc
+	inc e
 	dec d
 	jr nz,.nextMon
 	ccf
 	ret
 
-.hasMove:
 .foundMon:
+	;copy mon's name to wcd6d
+	ld a,e
+	ld [wWhichPokemon],a
+	call GetPartyMonName2
+
+.hasMove:
 	scf
 	ret
 	
