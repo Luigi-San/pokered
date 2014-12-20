@@ -2529,6 +2529,36 @@ hackInteractWaterTile:
 	jp hackCloseTextBox
 	
 	
+hackInteractCutBush:
+	;display the "can be cut" message.
+	call hackOpenTextBox
+	ld hl,hackTreeCutText
+	call PrintText
+	call WaitForTextScrollButtonPress
+	
+	ld a,[W_OBTAINEDBADGES]
+	bit 1,a
+	;jr z, .done ;player doesn't have badge needed to surf.
+	
+	ld b,CUT
+	call checkWhoHasMove
+	jr nc, .done ;nobody knows Cut.
+	
+	;ask if we want to cut.
+	ld hl, hackWantCutText
+	call PrintText
+	call YesNoChoice
+	ld a,[wCurrentMenuItem]
+	and a
+	jr nz, .done
+	
+	;use Cut
+	predef UsedCut
+	
+.done:
+	jp hackCloseTextBox
+	
+	
 hackDisplayText:
 	;display a textbox, wait for user to close it, and remove it.
 	push hl
@@ -2640,10 +2670,13 @@ checkWhoHasMove:
 	
 	
 ;map of tile ID => which function to use when pressing A at it.
+;XXX these might be tileset specific
 hackTileFunctions:
 	dbw $14, hackInteractWaterTile
 	dbw $32, hackInteractWaterTile
 	dbw $48, hackInteractWaterTile
+	dbw $3D, hackInteractCutBush
+	dbw $50, hackInteractCutBush
 	db $FF ;end of list.
 	
 	;displays tile ID if it's not in the above list.
@@ -2661,6 +2694,16 @@ hackWaterCalmText:
 hackWantSurfText:
 	db $0, "Do you want to "
 	next   "use SURF?@"
+	db "@" ;end text
+	
+hackTreeCutText:
+	db $0, "This tree can be"
+	next   "CUT!@"
+	db "@" ;end text
+	
+hackWantCutText:
+	db $0, "Do you want to "
+	next   "use CUT?@"
 	db "@" ;end text
 	
 POPS
