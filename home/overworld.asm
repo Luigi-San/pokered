@@ -100,7 +100,15 @@ ENDC
 	call IsSpriteOrSignInFrontOfPlayer
 	ld a,[hSpriteIndexOrTextID]
 	and a
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+	ld b,b
+	jr nz,.noCheck
+	callab HackCheckFacingTile
+	jp OverworldLoop
+.noCheck:
+ELSE
 	jp z,OverworldLoop
+ENDC
 .displayDialogue
 	predef GetTileAndCoordsInFrontOfPlayer
 	call UpdateSprites
@@ -2457,3 +2465,62 @@ ForceBikeOrSurf:: ; 12ed (0:12ed)
 	ld hl, LoadPlayerSpriteGraphics
 	call Bankswitch
 	jp PlayDefaultMusic ; update map/player state?
+	
+
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+PUSHS
+SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM
+HackCheckFacingTile::
+	;A was pressed and there isn't anything else here to talk to
+	predef GetTileAndCoordsInFrontOfPlayer
+	ld a,[wTileInFrontOfPlayer]
+	ld b,a
+	
+	ld hl,wcf11
+	set 0,[hl]
+	
+	;save and overwrite map text ptr
+	ld hl,W_MAPTEXTPTR
+	ld a,[hli]
+	ld b,a
+	ld a,[hld]
+	ld c,a
+	push bc
+	
+	ld bc, .debugTextPtrs
+	ld a,c
+	ld [hli],a
+	ld [hl],b
+	push hl
+	
+	ld a,1
+	ld [$ff8c],a
+	ld b,b ;breakpoint
+	call DisplayTextID
+	
+	;restore old map text ptr
+	pop hl
+	pop bc
+	ld a,c
+	ld [hld],a
+	ld [hl],b
+	
+	ret
+	
+.waterTiles:
+	db $14 ;water tile
+	db $32 ;either the left tile of the S.S. Anne boarding platform or the tile
+	       ;on eastern coastlines (depending on the current tileset)
+	db $48 ;tile on right on coast lines in Safari Zone
+	db $FF ;end of list
+	
+;temporary debugging text.
+.debugTextPtrs:
+	dw .debugTextWater
+
+.debugTextWater:
+	db $0 ;print inline text
+	db "Water@"
+	db "@" ;end text
+POPS
+ENDC

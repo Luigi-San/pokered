@@ -58,7 +58,7 @@ HACK_ADJUST_ITEM_QTY_BY_10 EQU 1
 HACK_SHOW_OWNED_ITEM_COUNT EQU 1
 
 
-;allow to set the text speed anywhere from 0 to 7
+;allow to set the text speed anywhere from 0 to 7 frames per letter
 HACK_FULL_TEXT_SPEED_OPTION EQU 1
 
 
@@ -67,7 +67,11 @@ HACK_DEFAULT_TEXT_SPEED_FAST EQU 1
 
 
 ;make the text always appear with no delay, regardless of the setting
-HACK_TEXT_NO_DELAY EQU 1
+HACK_TEXT_NO_DELAY EQU 0
+
+
+;allow to use HMs from the overworld by "talking" to bushes, water, rocks etc.
+HACK_USE_HM_FROM_OVERWORLD EQU 1
 
 
 ; Enable the original debug mode (bit 1 of wd732)
