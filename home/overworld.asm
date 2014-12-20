@@ -2484,7 +2484,6 @@ HackCheckFacingTile::
 	jr nz, .nextTile
 	
 	;get the function pointer and call it.
-	ld b,b
 	ld a,[hli]
 	ld h,[hl]
 	ld l,a
@@ -2506,11 +2505,19 @@ hackInteractWaterTile:
 	
 	ld a,[W_OBTAINEDBADGES]
 	bit 4,a
-	;jr z, .done ;player doesn't have badge needed to surf.
+	jr z, .done ;player doesn't have badge needed to surf.
 	
 	ld b,SURF
 	call checkWhoHasMove
-	;jr nc, .done ;nobody knows Surf.
+	jr nc, .done ;nobody knows Surf.
+	
+	;ask if we want to surf.
+	ld hl, hackWantSurfText
+	call PrintText
+	call YesNoChoice
+	ld a,[wCurrentMenuItem]
+	and a
+	jr nz, .done
 	
 	;use Surf
 	ld a,SURFBOARD
@@ -2643,6 +2650,11 @@ hackUnknownTileText:
 	
 hackWaterCalmText:
 	db $0, "The water is calm.@"
+	db "@" ;end text
+	
+hackWantSurfText:
+	db $0, "Do you want to "
+	next   "use SURF?@"
 	db "@" ;end text
 	
 POPS
