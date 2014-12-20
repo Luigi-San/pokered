@@ -2616,23 +2616,27 @@ checkWhoHasMove:
 	
 	
 hackOpenTextBox:
-	call hackForceNPCsStandStill
 	xor a
 	ld [wListMenuID],a
-	;call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
-	;xor a
-	ld [hWY],a ; put the window on the screen
-	call LoadFontTilePatterns
-	ld a,$01
-	ld [H_AUTOBGTRANSFERENABLED],a ; enable continuous WRAM to VRAM transfer each V-blank
+	call hackForceNPCsStandStill
+	call UpdateSprites
+	ld hl,wcfc4 ;have the map sprites reloaded after we're done.
+	set 0,[hl]
+	
 	hlCoord 0, 12
 	ld bc,$0412
 	call TextBoxBorder
 	
-	ld hl,wcfc4 ;have the map sprites reloaded after we're done.
-	set 0,[hl]
+	ld b,$9c ; window background address
+	call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
 	
-	jp UpdateSprites
+	xor a
+	ld [hWY],a ; put the window on the screen
+	call LoadFontTilePatterns
+	ld a,$01
+	ld [H_AUTOBGTRANSFERENABLED],a ; enable continuous WRAM to VRAM transfer each V-blank
+	
+	ret
 	
 hackCloseTextBox:
 	xor a
