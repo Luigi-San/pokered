@@ -2553,7 +2553,7 @@ hackInteractCutBush:
 	jr nz, .done
 	
 	;use Cut
-	predef UsedCut
+	callba HackUseCut
 	
 .done:
 	jp hackCloseTextBox
