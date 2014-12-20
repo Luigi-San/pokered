@@ -2542,10 +2542,10 @@ hackDisplayText:
 hackOpenTextBox:
 	xor a
 	ld [wListMenuID],a
-	call hackForceNPCsStandStill
-	call UpdateSprites
 	ld hl,wcfc4 ;have the map sprites reloaded after we're done.
 	set 0,[hl]
+	call hackForceNPCsStandStill
+	call UpdateSprites
 	
 	hlCoord 0, 12
 	ld bc,$0412
