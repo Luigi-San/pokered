@@ -1,4 +1,5 @@
 ;hack functions to use HM moves directly from the overworld.
+;TODO: Strength
 
 SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM where it fits.
 HackCheckFacingTile::
@@ -262,10 +263,12 @@ hackTileFunctionsGym:
 	
 	;displays tile ID if it's not in the above list.
 hackUnknownTileText:
-	db $0 ;print inline text
-		db "Tile @"
-		TX_NUM wTileInFrontOfPlayer, 1, 3
-		db "@" ;end string
+	db $0, "Tile @" ;print inline text
+	TX_NUM wTileInFrontOfPlayer, 1, 3
+	db $0
+	line "Tileset @"
+	TX_NUM W_CURMAPTILESET, 1, 3
+	;db "@" ;end string
 	db "@" ;end text
 	
 hackWaterCalmText:
