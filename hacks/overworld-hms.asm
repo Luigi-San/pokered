@@ -1,4 +1,6 @@
 ;hack functions to use HM moves directly from the overworld.
+;BUG: can't press A to cut a bush that previously had a hidden item on it.
+;Since the hidden item trigger is still there, our hook never gets called.
 
 SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM where it fits.
 HackCheckFacingTile::
