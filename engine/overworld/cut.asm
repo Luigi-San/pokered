@@ -47,6 +47,8 @@ asm_ef82: ; ef82 (3:6f82)
 	xor a
 	ld [hWY], a
 	
+	;we can call here to just use Cut without blanking the screen
+	;or looking up a mon name.
 HackUseCut::
 	ld hl, UsedCutText
 	call PrintText

@@ -2638,7 +2638,7 @@ checkWhoHasMove:
 	call .checkMonHasMove
 	jr c, .foundMon
 	push bc
-	ld bc,wPartyMon2 - wPartyMon1 ;size of PartyMon
+	ld bc,(wPartyMon2 - wPartyMon1) - NUM_MOVES ;to next party mon move1
 	add hl,bc
 	pop bc
 	inc e
