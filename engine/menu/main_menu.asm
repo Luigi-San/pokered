@@ -125,7 +125,11 @@ MainMenu: ; 5af2 (1:5af2)
 Func_5bff: ; 5bff (1:5bff)
 	ld a,1
 	ld [wd358],a
+IF HACK_DEFAULT_TEXT_SPEED_FAST == 1
+	ld a,0
+ELSE
 	ld a,3
+ENDC
 	ld [W_OPTIONS],a ;set default options
 	ret
 

@@ -62,6 +62,10 @@ HACK_SHOW_OWNED_ITEM_COUNT EQU 1
 HACK_FULL_TEXT_SPEED_OPTION EQU 1
 
 
+;make the default text speed the fastest setting (no delay)
+HACK_DEFAULT_TEXT_SPEED_FAST EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)
