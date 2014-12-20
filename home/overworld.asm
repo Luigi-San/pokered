@@ -2520,7 +2520,9 @@ HackCheckFacingTile::
 
 .debugTextWater:
 	db $0 ;print inline text
-	db "Water@"
+	db "Tile @"
+	TX_NUM wTileInFrontOfPlayer, 1, 3
+	db "@" ;end string
 	db "@" ;end text
 POPS
 ENDC
