@@ -2564,8 +2564,14 @@ hackOpenTextBox:
 hackCloseTextBox:
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED],a
-	jp CloseTextDisplay
-	
+	ld a,$90
+	ld [hWY],a ; move the window off the screen
+	callba InitMapSprites
+	ld hl,wcfc4
+	res 0,[hl]
+	call LoadPlayerSpriteGraphics
+	call LoadCurrentMapView
+	jp UpdateSprites
 	
 hackForceNPCsStandStill:
 	;set all NPCs to standing animation so that we can
