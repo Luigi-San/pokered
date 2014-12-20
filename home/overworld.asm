@@ -2472,10 +2472,23 @@ SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM where it fits.
 HackCheckFacingTile::
 	;A was pressed and there isn't anything else here to talk to
 	predef GetTileAndCoordsInFrontOfPlayer
+	
+	;get pointer to tile functions for this tileset.
+	ld a,[W_CURMAPTILESET]
+	ld b,0
+	ld c,a
+	ld hl, hackTilesetFunctions
+	add hl,bc
+	add hl,bc
+	ld a,[hli]
+	ld h,[hl]
+	ld l,a
+	
+	;get the tile ID.
 	ld a,[wTileInFrontOfPlayer]
 	ld b,a
 	
-	ld hl, hackTileFunctions
+	;check the function for this tile.
 .nextTile:
 	ld a,[hli]
 	cp $FF
@@ -2538,7 +2551,7 @@ hackInteractCutBush:
 	
 	ld a,[W_OBTAINEDBADGES]
 	bit 1,a
-	;jr z, .done ;player doesn't have badge needed to surf.
+	jr z, .done ;player doesn't have badge needed to cut.
 	
 	ld b,CUT
 	call checkWhoHasMove
@@ -2668,15 +2681,51 @@ checkWhoHasMove:
 	ccf
 	ret
 	
+
+;map of tileset ID => pointer to tile functions list
+hackTilesetFunctions:
+	dw hackTileFunctionsOverworld ;OVERWORLD
+	dw hackTileFunctionsNone      ;REDS_HOUSE_1
+	dw hackTileFunctionsNone      ;MART
+	dw hackTileFunctionsOverworld ;FOREST
+	dw hackTileFunctionsNone      ;REDS_HOUSE_2
+	dw hackTileFunctionsNone      ;DOJO
+	dw hackTileFunctionsNone      ;POKECENTER
+	dw hackTileFunctionsGym        ;GYM
+	dw hackTileFunctionsNone      ;HOUSE
+	dw hackTileFunctionsNone      ;FOREST_GATE
+	dw hackTileFunctionsNone      ;MUSEUM
+	dw hackTileFunctionsNone      ;UNDERGROUND
+	dw hackTileFunctionsNone      ;GATE
+	dw hackTileFunctionsNone      ;SHIP
+	dw hackTileFunctionsNone      ;SHIP_PORT
+	dw hackTileFunctionsNone      ;CEMETERY
+	dw hackTileFunctionsNone      ;INTERIOR
+	dw hackTileFunctionsNone      ;CAVERN
+	dw hackTileFunctionsNone      ;LOBBY
+	dw hackTileFunctionsNone      ;MANSION
+	dw hackTileFunctionsNone      ;LAB
+	dw hackTileFunctionsNone      ;CLUB
+	dw hackTileFunctionsNone      ;FACILITY
+	dw hackTileFunctionsNone      ;PLATEAU
+IF DEF(_OPTION_BEACH_HOUSE)
+	dw hackTileFunctionsNone      ;BEACH_HOUSE_TILESET
+ENDC
 	
 ;map of tile ID => which function to use when pressing A at it.
-;XXX these might be tileset specific
-hackTileFunctions:
+hackTileFunctionsOverworld:
 	dbw $14, hackInteractWaterTile
 	dbw $32, hackInteractWaterTile
 	dbw $48, hackInteractWaterTile
-	dbw $3D, hackInteractCutBush
-	dbw $50, hackInteractCutBush
+	dbw $3D, hackInteractCutBush  ;cut bush on overworld
+
+hackTileFunctionsNone:
+	;use the end-of-list marker for hackTileFunctionsOverworld
+	;as an empty list as well.
+	db $FF ;end of list.
+	
+hackTileFunctionsGym:
+	dbw $50, hackInteractCutBush  ;cut bush in gyms
 	db $FF ;end of list.
 	
 	;displays tile ID if it's not in the above list.
