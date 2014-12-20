@@ -3585,13 +3585,19 @@ PrintLetterDelay:: ; 38d3 (0:38d3)
 	ld a,[wd358]
 	bit 0,a
 	jr z,.waitOneFrame
+IF HACK_TEXT_NO_DELAY == 1
+	ld a,0
+ELSE
 	ld a,[W_OPTIONS]
 	and $f
+ENDC
 	ld [H_FRAMECOUNTER],a
 	jr .checkButtons
 .waitOneFrame
+IF HACK_TEXT_NO_DELAY == 0
 	ld a,1
 	ld [H_FRAMECOUNTER],a
+ENDC
 .checkButtons
 	call Joypad
 	ld a,[hJoyHeld]
@@ -3603,7 +3609,9 @@ PrintLetterDelay:: ; 38d3 (0:38d3)
 	bit 1,a ; is the B button pressed?
 	jr z,.buttonsNotPressed
 .endWait
+IF HACK_TEXT_NO_DELAY == 0
 	call DelayFrame
+ENDC
 	jr .done
 .buttonsNotPressed ; if neither A nor B is pressed
 	ld a,[H_FRAMECOUNTER]
