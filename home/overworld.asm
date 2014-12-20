@@ -101,7 +101,6 @@ ENDC
 	ld a,[hSpriteIndexOrTextID]
 	and a
 IF HACK_USE_HM_FROM_OVERWORLD == 1
-	ld b,b
 	jr nz,.noCheck
 	callab HackCheckFacingTile
 	jp OverworldLoop
@@ -2485,17 +2484,45 @@ HackCheckFacingTile::
 	cp b
 	jr nz, .checkWaterLoop
 	
-	;this is a water tile
-	ld a,2
-	jp .displayText
+	;this is a water tile.
+	;display the "water is calm" message.
+	xor a
+	ld [wListMenuID],a
+	call CopyScreenTileBufferToVRAM ; transfer background in WRAM to VRAM
+	xor a
+	ld [hWY],a ; put the window on the screen
+	call LoadFontTilePatterns
+	ld a,$01
+	ld [H_AUTOBGTRANSFERENABLED],a ; enable continuous WRAM to VRAM transfer each V-blank
+	hlCoord 0, 12
+	ld bc,$0412
+	call TextBoxBorder
+	call UpdateSprites
+	ld hl,.waterText
+	call PrintText
+	call WaitForTextScrollButtonPress
+	
+	ld a,[W_OBTAINEDBADGES]
+	bit 4,a
+	;ret z ;player doesn't have badge needed to surf.
+	
+	ld b,SURF
+	call checkWhoHasMove
+	;ret nc ;nobody knows Surf.
+	
+	;use Surf
+	ld a,SURFBOARD
+	ld [wcf91],a
+	ld [wd152],a
+	call UseItem
+	call CloseTextDisplay
+	ret
 	
 .notWater:
 	ld a,1
-	call .displayText
-	
-	
+	jp .displayText
 	ret
-	
+
 	;display one of the messages from debugTextPtrs
 	;A = which message
 .displayText:
@@ -2523,7 +2550,6 @@ HackCheckFacingTile::
 	push hl
 	
 	;display that text.
-	ld b,b ;breakpoint
 	call DisplayTextID
 	
 	;restore old map text pointer.
@@ -2533,6 +2559,7 @@ HackCheckFacingTile::
 	ld [hld],a
 	ld [hl],b
 	ret
+	
 	
 .waterTiles:
 	db $14 ;water tile
@@ -2555,8 +2582,49 @@ HackCheckFacingTile::
 	db "@" ;end text
 	
 .waterText:
-	db $0, "It's water.@"
+	db $0, "The water is calm.@"
 	db "@" ;end text
+	
+	
+;check which mon, if any, knows a move.
+;move ID in B
+;returns carry set if someone has it.
+checkWhoHasMove:
+	ld a,[wPartyCount]
+	and a
+	ret z
+	ld d,a
+	ld hl,wPartyMon1Moves
+.nextMon:
+	call .checkMonHasMove
+	jr c, .foundMon
+	push bc
+	ld bc,wPartyMon2 - wPartyMon1 ;size of PartyMon
+	add hl,bc
+	pop bc
+	dec d
+	jr nz,.nextMon
+	ccf
+	ret
+	
+.foundMon:
+	scf
+	ret
+	
+.checkMonHasMove:
+	ld c,NUM_MOVES
+.nextMove:
+	ld a,[hli]
+	cp b
+	jr z,.hasMove
+	dec c
+	jr nz,.nextMove
+	ccf
+	ret
+	
+.hasMove:
+	scf
+	ret
 
 POPS
 ENDC
