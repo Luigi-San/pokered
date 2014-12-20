@@ -1,3 +1,4 @@
+INCLUDE "hacks.asm"
 
 text   EQUS "db $00," ; Start writing text.
 next   EQUS "db $4e," ; Move a line down.

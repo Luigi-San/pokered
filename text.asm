@@ -62,8 +62,18 @@ _GroundRoseText:: ; 80096 (20:4096)
 	done
 
 _BoulderText:: ; 800b1 (20:40b1)
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+	db $08 ;execute inline code
+	callab hackUseStrengthOverworld
+	ld hl, _BoulderTextEnd ;resume text
+	ret
+	
+_BoulderTextEnd:
+	db "@"
+ELSE
 	text "This requires"
 	line "STRENGTH to move!"
+ENDC
 	done
 
 _MartSignText:: ; 800d2 (20:40d2)

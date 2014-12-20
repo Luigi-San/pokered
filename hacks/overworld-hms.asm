@@ -214,6 +214,49 @@ checkWhoHasMove:
 	ccf
 	ret
 	
+	
+;called from the boulder text "requires strength to move"
+hackUseStrengthOverworld::
+	ld a,[wd728]
+	bit 0,a ;Strength used?
+	jr nz,.alreadyUsed
+	
+	;show "requires strength" text
+	ld hl,hackNeedStrengthText
+	call PrintText
+	call WaitForTextScrollButtonPress
+	
+	ld a,[W_OBTAINEDBADGES]
+	bit 1,a
+	jr z, .done ;player doesn't have badge needed to use Strength.
+	
+	ld b,STRENGTH
+	call checkWhoHasMove
+	jr nc, .done ;nobody knows Strength.
+	
+	;ask if we want to use it.
+	ld hl, hackWantStrengthText
+	call PrintText
+	call YesNoChoice
+	ld a,[wCurrentMenuItem]
+	and a
+	jr nz, .done
+	
+	;use Strength
+	predef PrintStrengthTxt
+	
+.done:
+	;don't wait for A button press.
+	ld a,1
+	ld [wDoNotWaitForButtonPressAfterDisplayingText],a
+	ret
+	
+.alreadyUsed:
+	ld hl,hackStrengthActiveText
+	call PrintText
+	call WaitForTextScrollButtonPress
+	jr .done
+	
 
 ;map of tileset ID => pointer to tile functions list
 ;XXX add more tilesets and their tile IDs.
@@ -263,29 +306,43 @@ hackTileFunctionsGym:
 	
 	;displays tile ID if it's not in the above list.
 hackUnknownTileText:
-	db $0, "Tile @" ;print inline text
+	text "Tile @" ;print inline text
 	TX_NUM wTileInFrontOfPlayer, 1, 3
 	db $0
 	line "Tileset @"
 	TX_NUM W_CURMAPTILESET, 1, 3
-	;db "@" ;end string
 	db "@" ;end text
 	
 hackWaterCalmText:
-	db $0, "The water is calm.@"
+	text "The water is calm.@"
 	db "@" ;end text
 	
 hackWantSurfText:
-	db $0, "Do you want to "
-	next   "use SURF?@"
+	text "Do you want to "
+	next "use SURF?@"
 	db "@" ;end text
 	
 hackTreeCutText:
-	db $0, "This tree can be"
-	next   "CUT!@"
+	text "This tree can be"
+	next "CUT!@"
 	db "@" ;end text
 	
 hackWantCutText:
-	db $0, "Do you want to "
-	next   "use CUT?@"
+	text "Do you want to "
+	next "use CUT?@"
+	db "@" ;end text
+	
+hackNeedStrengthText:
+	text "This requires"
+	next "STRENGTH to move!@"
+	db "@" ;end text
+	
+hackWantStrengthText:
+	text "Do you want to "
+	next "use STRENGTH?@"
+	db "@" ;end text
+	
+hackStrengthActiveText:
+	text "Boulders can now"
+	next "be moved.@"
 	db "@" ;end text

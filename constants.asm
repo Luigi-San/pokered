@@ -1,4 +1,3 @@
-INCLUDE "hacks.asm"
 INCLUDE "macros.asm"
 
 INCLUDE "hram.asm"
