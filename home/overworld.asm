@@ -2469,17 +2469,45 @@ ForceBikeOrSurf:: ; 12ed (0:12ed)
 
 IF HACK_USE_HM_FROM_OVERWORLD == 1
 PUSHS
-SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM
+SECTION "HackUseHMsFromOverworld",ROMX ;put this somewhere in ROM where it fits.
 HackCheckFacingTile::
 	;A was pressed and there isn't anything else here to talk to
 	predef GetTileAndCoordsInFrontOfPlayer
 	ld a,[wTileInFrontOfPlayer]
 	ld b,a
 	
+	;check if this is a water tile
+	ld hl,.waterTiles
+.checkWaterLoop:
+	ld a,[hli]
+	cp $FF
+	jr z,.notWater
+	cp b
+	jr nz, .checkWaterLoop
+	
+	;this is a water tile
+	ld a,2
+	jp .displayText
+	
+.notWater:
+	ld a,1
+	call .displayText
+	
+	
+	ret
+	
+	;display one of the messages from debugTextPtrs
+	;A = which message
+.displayText:
 	ld hl,wcf11
 	set 0,[hl]
 	
-	;save and overwrite map text ptr
+	;store the text ID
+	ld [$ff8c],a
+	
+	;save the current map text pointer.
+	;this seems to be the only way to actually display a popup message
+	;with an aribtrary text pointer.
 	ld hl,W_MAPTEXTPTR
 	ld a,[hli]
 	ld b,a
@@ -2487,24 +2515,23 @@ HackCheckFacingTile::
 	ld c,a
 	push bc
 	
-	ld bc, .debugTextPtrs
-	ld a,c
+	;replace the current text pointer with our own.
+	ld de,.textPtrs
+	ld a,e
 	ld [hli],a
-	ld [hl],b
+	ld [hl],d
 	push hl
 	
-	ld a,1
-	ld [$ff8c],a
+	;display that text.
 	ld b,b ;breakpoint
 	call DisplayTextID
 	
-	;restore old map text ptr
+	;restore old map text pointer.
 	pop hl
 	pop bc
 	ld a,c
 	ld [hld],a
 	ld [hl],b
-	
 	ret
 	
 .waterTiles:
@@ -2514,15 +2541,22 @@ HackCheckFacingTile::
 	db $48 ;tile on right on coast lines in Safari Zone
 	db $FF ;end of list
 	
-;temporary debugging text.
-.debugTextPtrs:
-	dw .debugTextWater
+.textPtrs:
+	;msg 0 is nonexistent, since it always shows the start menu.
+	dw .debugTextWhichTile ;msg 1
+	dw .waterText
 
-.debugTextWater:
+	;debug message, shows which tile ID you're standing at
+.debugTextWhichTile:
 	db $0 ;print inline text
-	db "Tile @"
-	TX_NUM wTileInFrontOfPlayer, 1, 3
-	db "@" ;end string
+		db "Tile @"
+		TX_NUM wTileInFrontOfPlayer, 1, 3
+		db "@" ;end string
 	db "@" ;end text
+	
+.waterText:
+	db $0, "It's water.@"
+	db "@" ;end text
+
 POPS
 ENDC
