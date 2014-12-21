@@ -4657,6 +4657,10 @@ Func_3ead:: ; 3ead (0:3ead)
 	jp Bankswitch
 
 CheckForHiddenObjectOrBookshelfOrCardKeyDoor:: ; 3eb5 (0:3eb5)
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+	xor a
+	ld [wEnemyPartyCount],a ;re-use this address
+ENDC
 	ld a, [H_LOADEDROMBANK]
 	push af
 	ld a, [hJoyHeld]

@@ -94,9 +94,18 @@ ENDC
 	call IsPlayerCharacterBeingControlledByGame
 	jr nz,.checkForOpponent
 	call CheckForHiddenObjectOrBookshelfOrCardKeyDoor
+	
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+	ld a,[wEnemyPartyCount] ;re-use this address
+	and a
+	jr z, .noHiddenItem ;there was a hidden item but it's already gone
+ENDC
+	
 	ld a,[$ffeb]
 	and a
 	jp z,OverworldLoop ; jump if a hidden object or bookshelf was found, but not if a card key door was found
+	
+.noHiddenItem:
 	call IsSpriteOrSignInFrontOfPlayer
 	ld a,[hSpriteIndexOrTextID]
 	and a

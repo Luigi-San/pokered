@@ -13,6 +13,11 @@ HiddenItems: ; 76688 (1d:6688)
 	call EnableAutoTextBoxDrawing
 	ld a, $1
 	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
+IF HACK_USE_HM_FROM_OVERWORLD == 1
+	ld [wEnemyPartyCount],a ;re-use this address as a flag to tell
+		;whether there actually is a hidden item here that hasn't been
+		;collected already.
+ENDC
 	ld a, [wWhichTrade] ; item ID
 	ld [wd11e], a
 	call GetItemName
