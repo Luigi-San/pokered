@@ -7,7 +7,8 @@ Current enhancements available:
 
 * Increase walking speed (always, or only while holding B)
 * Use Cut/Surf/Strength directly from the overworld
-* Allow more precise control over text delay (0 to 7 frames per letter)
+* Allow more precise control over text delay (0 to 7 frames per letter, with
+  option to make 0 the default)
 * Disable low health alarm, or make it beep only a few times and then stop
 * Improvements to battle screen (more info about selected move, show "caught"
   indicator, etc)
@@ -22,7 +23,6 @@ Current enhancements available:
 
 Planned enhancements:
 
-* Use HMs directly from overworld (like in later games)
 * Register items to Select button
 * Notify when PC box is (nearly) full, and/or allow to change it from anywhere
 * Show descriptions of items and moves

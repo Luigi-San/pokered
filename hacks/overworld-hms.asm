@@ -44,6 +44,11 @@ HackCheckFacingTile::
 	
 	
 hackInteractWaterTile:
+	;are we already surfing?
+	ld a,[wWalkBikeSurfState]
+	cp 2
+	ret z
+	
 	;display the "water is calm" message.
 	call hackOpenTextBox
 	ld hl,hackWaterCalmText
