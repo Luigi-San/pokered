@@ -181,11 +181,18 @@ DrawHPBar:: ; 1336 (0:1336)
 IF HACK_FREE_ROM0_SPACE == 1
 	;we need more ROM0 space, and this function is safe to move
 	;(it doesn't access any ROM banks)
-	
+	;however we can't use BankswitchHome here, because it overwrites
+	;global variables, because hur dur how do code.
+	ld a,[H_LOADEDROMBANK]
+	push af
 	ld a,BANK(DrawHPBar_)
-	call BankswitchHome
+	ld [H_LOADEDROMBANK],a
+	ld [$2000],a
 	call DrawHPBar_
-	jp BankswitchBack
+	pop af
+	ld [H_LOADEDROMBANK],a
+	ld [$2000],a
+	ret
 	
 	PUSHS
 	SECTION "DrawHPBar",ROMX
@@ -448,6 +455,7 @@ HandlePartyMenuInput:: ; 145a (0:145a)
 	ld a,[wMenuItemToSwap]
 	and a
 	jp nz,.swappingPokemon
+	
 	pop af
 	ld [hTilesetType],a
 	bit 1,b
