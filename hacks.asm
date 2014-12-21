@@ -74,6 +74,10 @@ HACK_TEXT_NO_DELAY EQU 0
 HACK_USE_HM_FROM_OVERWORLD EQU 1
 
 
+;allow to register items to Select button
+HACK_REGISTER_ITEM_TO_SELECT EQU 1
+
+
 ; Enable the original debug mode (bit 1 of wd732)
 ; This activates the following functions in the existing code:
 ; * Skip new game intro (use default names)
@@ -95,3 +99,15 @@ HACK_NEW_DEBUG_MENU EQU 1
 
 ;skip the intro and boot directly to the title screen
 HACK_SKIP_INTRO EQU 1
+
+
+;try to free some ROM0 space. needed for some hacks,
+;especially if using several at once.
+_CRAP_ASSEMBLER_1 EQU HACK_REGISTER_ITEM_TO_SELECT | HACK_USE_HM_FROM_OVERWORLD
+_CRAP_ASSEMBLER_2 EQU HACK_SHOW_OWNED_ITEM_COUNT | HACK_ADJUST_ITEM_QTY_BY_10
+_CRAP_ASSEMBLER_3 EQU _CRAP_ASSEMBLER_1 | _CRAP_ASSEMBLER_2
+IF _CRAP_ASSEMBLER_3 == 0
+HACK_FREE_ROM0_SPACE EQU 0
+ELSE
+HACK_FREE_ROM0_SPACE EQU 1
+ENDC

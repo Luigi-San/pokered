@@ -1171,32 +1171,34 @@ INCLUDE "engine/overworld/cable_club_npc.asm"
 ; function to draw various text boxes
 ; INPUT:
 ; [wd125] = text box ID:
-;  0: Invalid?
-;  1: Standard dialogue box
-;  2: ??? just freezes?
-;  3: Unknown (20x15 at 0,0)
-;  4: Stats/Switch/Cancel plus HM field moves
-;  5: Unknown (14x17 at 0,0)
-;  6: Use/Toss
-;  7: Unknown (11x6 at 0,0)
-;  8: Unknown (8x6 at 0,0, displays garbage)
-;  9: Unknown (6x5 at 0,6, displays garbage)
-; 10: none?
-; 11: Fight/Item/Pkmn/Run
-; 12: Switch/Stats/Cancel (used in battle)
-; 13: Item list
-; 14: Buy/Sell/Quit (used by marts)
-; 15: Money (empty - used by marts)
-; 16: Unknonwn (13x18 at 7,0)
-; 17: Centred frame for Pokemon picture (e.g. when choosing starter)
-; 18: Centred box (4x4 at 7,6) displaying "Am!"
-; 19: Money (with actual balance displayed)
-; 20: Yes/No, but doesn't show up (call YesNoChoice instead), also Heal/Cancel
-; 21: Buy/Sell/Quit (used by marts)
-; 22: crash
-; 25: crash
-; 26: Unknown (9x10 at 11,8, displays garbage)
-; 27: Fight/Item/Pkmn/Run or Ball/Bait/Rock/Run
+; 00: Invalid?
+; 01: Standard dialogue box
+; 02: ??? just freezes?
+; 03: Unknown (20x15 at 0,0)
+; 04: Stats/Switch/Cancel plus HM field moves
+; 05: Unused (Japanese "Belongings")
+; 06: Use/Toss
+; 07: Unknown (11x6 at 0,0)
+; 08: Unused (Japanese save message)
+; 09: Unused (Japanese speed options)
+; 0A: none?
+; 0B: Fight/Item/Pkmn/Run
+; 0C: Switch/Stats/Cancel (used in battle)
+; 0D: Item list
+; 0E: Buy/Sell/Quit (used by marts)
+; 0F: Money (empty - used by marts)
+; 10: Unknonwn (13x18 at 7,0)
+; 11: Centred frame for Pokemon picture (e.g. when choosing starter)
+; 12: Centred box (4x4 at 7,6) displaying "Am!" (Japanese "ah!")
+; 13: Money (with actual balance displayed)
+; 14: Yes/No, but doesn't show up (call YesNoChoice instead), also Heal/Cancel
+; 15: Buy/Sell/Quit (used by marts)
+; 16: crash
+; 17: crash
+; 18: crash
+; 19: crash
+; 1A: Unused (Japanese Pokedex menu)
+; 1B: Fight/Item/Pkmn/Run or Ball/Bait/Rock/Run
 ; some of these requre prior initialization, and will crash or show previous
 ; configurations otherwise
 DisplayTextBoxID_: ; 72ea (1:72ea)

@@ -178,6 +178,21 @@ DrawHPBar:: ; 1336 (0:1336)
 ; If c is nonzero, show at least a sliver regardless.
 ; The right end of the bar changes with [wListMenuID].
 
+IF HACK_FREE_ROM0_SPACE == 1
+	;we need more ROM0 space, and this function is safe to move
+	;(it doesn't access any ROM banks)
+	
+	ld a,BANK(DrawHPBar_)
+	call BankswitchHome
+	call DrawHPBar_
+	jp BankswitchBack
+	
+	PUSHS
+	SECTION "DrawHPBar",ROMX
+DrawHPBar_:
+ENDC
+
+
 	push hl
 	push de
 	push bc
@@ -240,6 +255,10 @@ DrawHPBar:: ; 1336 (0:1336)
 	pop de
 	pop hl
 	ret
+	
+IF HACK_FREE_ROM0_SPACE == 1
+POPS
+ENDC
 
 
 ; loads pokemon data from one of multiple sources to wcf98
