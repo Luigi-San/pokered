@@ -404,6 +404,14 @@ HackNewDebugMenu:: ;show the menu
 	;if I save that and restore it after calling the PC,
 	;the game will actually crash, which makes no goddamn sense.
 	;even with this, the start menu doesn't actually close.
+	
+	
+.funcShowTextbox:
+	ld a,[wHackDebugMenuWhichSound]
+	ld [wd125],a
+	call DisplayTextBoxID
+	call HandleMenuInput
+	jp CloseStartMenu
 
 	
 .funcPlaySound:
@@ -427,7 +435,7 @@ HackNewDebugMenu:: ;show the menu
 	dw .funcHealParty
 	dw .funcGiveMoney
 	dw .funcOpenPC
-	dw .funcPlaySound
+	dw .funcShowTextbox
 
 	
 	;Item text
@@ -439,7 +447,7 @@ HackNewDebugMenu:: ;show the menu
 	next "Heal Party"
 	next "Give Money"
 	next "Open PC"
-	next "Play Sound"
+	next "Show Txtbx"
 	db "@" ;end text
 	
 .questionText:

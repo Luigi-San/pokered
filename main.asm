@@ -1170,7 +1170,35 @@ INCLUDE "engine/overworld/cable_club_npc.asm"
 
 ; function to draw various text boxes
 ; INPUT:
-; [wd125] = text box ID
+; [wd125] = text box ID:
+;  0: Invalid?
+;  1: Standard dialogue box
+;  2: ??? just freezes?
+;  3: Unknown (20x15 at 0,0)
+;  4: Stats/Switch/Cancel plus HM field moves
+;  5: Unknown (14x17 at 0,0)
+;  6: Use/Toss
+;  7: Unknown (11x6 at 0,0)
+;  8: Unknown (8x6 at 0,0, displays garbage)
+;  9: Unknown (6x5 at 0,6, displays garbage)
+; 10: none?
+; 11: Fight/Item/Pkmn/Run
+; 12: Switch/Stats/Cancel (used in battle)
+; 13: Item list
+; 14: Buy/Sell/Quit (used by marts)
+; 15: Money (empty - used by marts)
+; 16: Unknonwn (13x18 at 7,0)
+; 17: Centred frame for Pokemon picture (e.g. when choosing starter)
+; 18: Centred box (4x4 at 7,6) displaying "Am!"
+; 19: Money (with actual balance displayed)
+; 20: Yes/No, but doesn't show up (call YesNoChoice instead), also Heal/Cancel
+; 21: Buy/Sell/Quit (used by marts)
+; 22: crash
+; 25: crash
+; 26: Unknown (9x10 at 11,8, displays garbage)
+; 27: Fight/Item/Pkmn/Run or Ball/Bait/Rock/Run
+; some of these requre prior initialization, and will crash or show previous
+; configurations otherwise
 DisplayTextBoxID_: ; 72ea (1:72ea)
 	ld a,[wd125] ; a = text box ID
 	cp a,$14
@@ -1337,7 +1365,7 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 	dw JapaneseMochimonoText
 	db 3,0   ; text coordinates
 
-	db $06 ; text box ID
+	db $06 ; text box ID (use/toss item)
 	db 13,10,19,14 ; text box coordinates
 	dw UseTossText
 	db 15,11 ; text coordinates
