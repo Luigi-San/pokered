@@ -82,15 +82,15 @@ HACK_USE_HM_FROM_OVERWORLD EQU 1
 ; note that this hack might interfere with link battles, because those turn
 ; the debug mode off for some reason, but this hack forces it back on.
 ; probably this has to do with them re-using the "destination map" variable.
-HACK_ENABLE_DEBUG_MODE EQU 1
+HACK_ENABLE_DEBUG_MODE EQU 0
 
 
 ;hold B to walk through walls.
-HACK_WALK_THROUGH_WALLS EQU 1
+HACK_WALK_THROUGH_WALLS EQU 0
 
 
 ;enable a new debug menu (not in the original program)
-HACK_NEW_DEBUG_MENU EQU 1
+HACK_NEW_DEBUG_MENU EQU 0
 
 
 ;skip the intro and boot directly to the title screen
